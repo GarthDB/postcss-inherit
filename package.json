@@ -1,0 +1,32 @@
+{
+  "name": "postcss-inherit",
+  "version": "0.0.1",
+  "description": "PostCSS plugin inherit rules from other selectors",
+  "keywords": [
+    "postcss",
+    "css",
+    "postcss-plugin",
+    "inherit"
+  ],
+  "author": "garthdb <garthdb@gmail.com> (http://garthdb.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/garthdb/postcss-inherit.git"
+  },
+  "dependencies": {
+    "debug": "^2.2.0",
+    "postcss": "^4.1.9",
+    "rework": "^1.0.1",
+    "rework-inherit": "^0.2.3"
+  },
+  "devDependencies": {
+    "gulp-eslint": "^0.12.0",
+    "gulp-mocha": "^2.0.1",
+    "chai": "^2.3.0",
+    "gulp": "^3.8.11"
+  },
+  "scripts": {
+    "test": "gulp"
+  }
+}

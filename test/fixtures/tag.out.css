@@ -1,0 +1,22 @@
+em,
+.test {
+  text-decoration: bold;
+}
+
+a em,
+a .test {
+  color: red;
+}
+
+em > span,
+.test > span {
+  color: yellow;
+}
+
+.emphasis {
+  text-decoration: bold;
+}
+
+.them {
+  color: gray;
+}
