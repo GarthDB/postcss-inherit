@@ -17,8 +17,8 @@
   "dependencies": {
     "debug": "^2.2.0",
     "postcss": "^4.1.9",
-    "rework": "^1.0.1",
-    "rework-inherit": "^0.2.3"
+    "rework": "1.0.1",
+    "rework-inherit": "git@github.com:reworkcss/rework-inherit.git"
   },
   "devDependencies": {
     "gulp-eslint": "^0.12.0",
