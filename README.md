@@ -3,8 +3,8 @@
 [PostCSS] plugin inherit rules from other selectors.
 
 [PostCSS]: https://github.com/postcss/postcss
-[ci-img]:  https://travis-ci.org/garthdb/postcss-inherit.svg
-[ci]:      https://travis-ci.org/garthdb/postcss-inherit
+[ci-img]:  https://travis-ci.org/GarthDB/postcss-inherit.svg
+[ci]:      https://travis-ci.org/GarthDB/postcss-inherit
 
 ```css
 .foo {
