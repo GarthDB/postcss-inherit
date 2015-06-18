@@ -1,0 +1,8 @@
+.button,
+.smaller-button {
+  width: 100%;
+}
+
+.smaller-button {
+  max-width: 250px;
+}

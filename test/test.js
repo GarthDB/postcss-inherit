@@ -1,6 +1,7 @@
 var postcss = require('postcss');
 var expect  = require('chai').expect;
 var fs = require('fs');
+var importAt = require('postcss-import');
 
 var inherit = require('../');
 
@@ -62,5 +63,18 @@ describe('postcss-inherit', function () {
     it('should Extend regexp', function(done){
         test(read('extend'), read('chain.out'), {propertyRegExp: /^extends?$/}, done);
     });
-
+    it('should extend a class', function(done){
+        test(read('class'), read('class.out'), {}, done);
+    });
+    it('should work after another plugin', function(done){
+        var inputcss = read('import');
+        var expectedOutput = read('import.out');
+        postcss([importAt(), inherit()]).process(inputcss).then(function (result){
+            expect(result.css.trim()).to.eql(expectedOutput.trim());
+            expect(result.warnings()).to.be.empty;
+            done();
+        }).catch(function (error) {
+            done(error);
+        });
+    });
 });

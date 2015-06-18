@@ -1,0 +1,5 @@
+@import "test/fixtures/attribute.css";
+
+submit {
+  inherit: %form-element;
+}

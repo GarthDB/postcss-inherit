@@ -1,0 +1,6 @@
+input[disabled],
+select[disabled],
+textarea[disabled],
+submit[disabled] {
+  cursor: not-allowed;
+}
