@@ -6,11 +6,11 @@ var parse = require('postcss/lib/parse');
 module.exports = postcss.plugin('postcss-inherit', function (opts) {
     opts = opts || {};
 
-  // Work with options here
+    // Work with options here
 
-    return function (css) {
+    return function (css, result) {
         var inputCSS = css.toString();
         var outputCSS = rework(inputCSS).use(inherit(opts)).toString();
-        return parse(outputCSS);
+        result.root = parse(outputCSS);
     };
 });
