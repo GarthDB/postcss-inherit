@@ -6,6 +6,6 @@
 [ci-img]:  https://travis-ci.org/GarthDB/postcss-inherit.svg
 [ci]:      https://travis-ci.org/GarthDB/postcss-inherit
 
-A port of the [Rework Inherit](https://github.com/reworkcss/rework-inherit) plugin to PostCSS.
+A wrapper around the [Rework Inherit](https://github.com/reworkcss/rework-inherit) plugin for PostCSS.
 
 You can find all the documentation you might need over on the other plugin's [README](https://github.com/reworkcss/rework-inherit/blob/master/README.md).
