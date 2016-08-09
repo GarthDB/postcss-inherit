@@ -1,21 +1,23 @@
 {
-    "rules": {
-        "no-unused-expressions": [0],
-        "no-underscore-dangle":  [0],
-        "no-reserved-keys":      [2],
-        "no-multi-spaces":       [0],
-        "no-extra-parens":       [2],
-        "no-unused-vars":        [2],
-        "no-loop-func":          [0],
-        "key-spacing":           [0],
-        "max-len":               [2],
-        "strict":                [0],
-        "indent":                [2],
-        "quotes":                [2, "single", "avoid-escape"],
-        "curly":                 [0]
-    },
-    "env": {
-        "mocha": true,
-        "node":  true
-    }
+  "extends": "airbnb",
+  "ecmaFeatures": {
+    "jsx": true,
+    "modules": true,
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true,
+    "mocha": true,
+  },
+  "rules": {
+    "no-param-reassign": [2, {
+      "props": false
+    }],
+    "chai-expect/missing-assertion": 2,
+    "chai-expect/terminating-properties": 1,
+  },
+  "plugins": [
+    "chai-expect"
+  ],
 }

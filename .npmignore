@@ -1,8 +1,8 @@
-.gitignore
-
-node_modules/
-
+src/
 test/
-.travis.yml
-
-gulpfile.js
+.*
+coverage
+inch.json
+docs.json
+node_modules/
+npm-debug.log

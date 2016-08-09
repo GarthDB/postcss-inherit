@@ -1,33 +1,64 @@
 {
   "name": "postcss-inherit",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "PostCSS plugin inherit rules from other selectors",
-  "keywords": [
-    "postcss",
-    "css",
-    "postcss-plugin",
-    "inherit"
-  ],
-  "author": "garthdb <garthdb@gmail.com> (http://garthdb.com)",
-  "license": "MIT",
+  "scripts": {
+    "compile": "babel -d lib/ src/",
+    "compile-watch": "babel --watch -d lib/ src/",
+    "prepublish": "npm run compile",
+    "test": "mocha test",
+    "test-watch": "multi='mocha-osx-reporter=- nyan=-' mocha --watch --reporter mocha-multi test/",
+    "coverage": "nyc npm test",
+    "codeclimate": "npm run coverage && nyc report --reporter=text-lcov | codeclimate-test-reporter",
+    "lint": "eslint --ignore-path .gitignore ."
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/garthdb/postcss-inherit.git"
   },
+  "keywords": [
+    "postcss",
+    "css",
+    "postcss-plugin",
+    "inherit",
+    "extend"
+  ],
+  "nyc": {
+    "exclude": [
+      "lib",
+      "test"
+    ],
+    "require": [
+      "babel-register"
+    ]
+  },
+  "author": "garthdb <garthdb@gmail.com> (http://garthdb.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/garthdb/postcss-inherit/issues"
+  },
+  "homepage": "https://github.com/topmarks/topmarks#readme",
   "dependencies": {
     "debug": "^2.2.0",
-    "postcss": "^5.0.10",
-    "rework": "1.0.1",
-    "rework-inherit": "https://github.com/reworkcss/rework-inherit/tarball/master"
+    "postcss": "^5.0.10"
   },
   "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-core": "^6.9.1",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.9.0",
     "chai": "^2.3.0",
-    "gulp": "^3.8.11",
-    "gulp-eslint": "^0.12.0",
-    "gulp-mocha": "^2.0.1",
+    "codeclimate-test-reporter": "^0.3.3",
+    "eslint": "^2.9.0",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-chai-expect": "^1.1.1",
+    "eslint-plugin-import": "^1.12.0",
+    "eslint-plugin-jsx-a11y": "^1.2.0",
+    "eslint-plugin-react": "^5.2.2",
+    "mocha": "^3.0.0",
+    "mocha-multi": "^0.9.0",
+    "mocha-osx-reporter": "^0.1.2",
+    "nyc": "^7.1.0",
     "postcss-import": "^7.0.0"
-  },
-  "scripts": {
-    "test": "gulp"
   }
 }
