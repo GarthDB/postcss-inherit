@@ -1,0 +1,7 @@
+%form-element {
+  cursor: not-allowed;
+}
+
+input {
+  inherit: %form-element;
+}

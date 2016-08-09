@@ -1,11 +1,274 @@
-# PostCSS Inherit [![Build Status][ci-img]][ci]
+# PostCSS Inherit
 
-[PostCSS] plugin inherit rules from other selectors.
+[![Build Status](https://travis-ci.org/GarthDB/postcss-inherit.svg?branch=master)](https://travis-ci.org/GarthDB/postcss-inherit) [![Code Climate](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/gpa.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit) [![Test Coverage](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/coverage.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit/coverage) [![Issue Count](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/issue_count.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit) [![Dependency Status](https://david-dm.org/GarthDB/postcss-inherit.svg)](https://david-dm.org/GarthDB/postcss-inherit) [![Inline docs](http://inch-ci.org/github/GarthDB/postcss-inherit.svg?branch=master)](http://inch-ci.org/github/GarthDB/postcss-inherit)
 
-[PostCSS]: https://github.com/postcss/postcss
-[ci-img]:  https://travis-ci.org/GarthDB/postcss-inherit.svg
-[ci]:      https://travis-ci.org/GarthDB/postcss-inherit
+[![NPM](https://nodei.co/npm/postcss-inherit.svg)](https://npmjs.org/package/postcss-inherit)
 
-A wrapper around the [Rework Inherit](https://github.com/reworkcss/rework-inherit) plugin for PostCSS.
+---
 
-You can find all the documentation you might need over on the other plugin's [README](https://github.com/reworkcss/rework-inherit/blob/master/README.md).
+<img align="right" width="95" height="95"
+     title="Philosopher’s stone, logo of PostCSS"
+     src="http://postcss.github.io/postcss/logo.svg">
+
+Inherit mixin for [PostCSS](https://github.com/postcss/postcss). Allows you to inherit all the rules associated with a given selector. Modeled after [rework-inherit](https://github.com/reworkcss/rework-inherit).
+
+## API
+
+```js
+var postcss = require('postcss');
+var inherit = require('postcss-inherit')
+
+postcss([ inherit ])
+  .process(css, { from: 'src/app.css', to: 'app.css' })
+  .then(function (result) {
+    fs.writeFileSync('app.css', result.css);
+    if ( result.map ) fs.writeFileSync('app.css.map', result.map);
+  });
+```
+
+### Inherit(options{})
+
+Option parameters:
+
+* `propertyRegExp` - Regular expression to match the "inherit" property.
+  By default, it is `/^(inherit|extend)s?$/i`, so it matches "inherit", "inherits", "extend", and "extends".
+  For example, if you only want to allow the `extend` keyword,
+  set the regular expression to `/^extend$/`.
+
+## Examples
+
+### Regular inherit
+
+```css
+.gray {
+  color: gray;
+}
+
+.text {
+  inherit: .gray;
+}
+```
+
+yields:
+
+```css
+.gray,
+.text {
+  color: gray;
+}
+```
+
+### Multiple inherit
+
+Inherit multiple selectors at the same time.
+
+```css
+.gray {
+  color: gray;
+}
+
+.black {
+  color: black;
+}
+
+.button {
+  inherit: .gray, .black;
+}
+```
+
+yields:
+
+```css
+.gray,
+.button {
+  color: gray;
+}
+
+.black,
+.button {
+  color: black;
+}
+```
+
+### Placeholders
+
+Any selector that includes a `%` is considered a placeholder.
+Placeholders will not be output in the final CSS.
+
+```css
+%gray {
+  color: gray;
+}
+
+.text {
+  inherit: %gray;
+}
+```
+
+yields:
+
+```css
+.text {
+  color: gray;
+}
+```
+
+### Partial selectors
+
+If you inherit a selector,
+all rules that include that selector will be included as well.
+
+```css
+div button span {
+  color: red;
+}
+
+div button {
+  color: green;
+}
+
+button span {
+  color: pink;
+}
+
+.button {
+  inherit: button;
+}
+
+.link {
+  inherit: div button;
+}
+```
+
+yields:
+
+```css
+div button span,
+div .button span,
+.link span {
+  color: red;
+}
+
+div button,
+div .button,
+.link {
+  color: green;
+}
+
+button span,
+.button span {
+  color: pink;
+}
+```
+
+### Chained inheritance
+
+```css
+.button {
+  background-color: gray;
+}
+
+.button-large {
+  inherit: .button;
+  padding: 10px;
+}
+
+.button-large-red {
+  inherit: .button-large;
+  color: red;
+}
+```
+
+yields:
+
+```css
+.button,
+.button-large,
+.button-large-red {
+  background-color: gray;
+}
+
+.button-large,
+.button-large-red {
+  padding: 10px;
+}
+
+.button-large-red {
+  color: red;
+}
+```
+
+### Media Queries
+
+Inheriting from inside a media query will create a copy of the declarations.
+It will act like a "mixin".
+Thus, with `%`placeholders, you won't have to use mixins at all.
+Each type of media query will need its own declaration,
+so there will be some inevitable repetition.
+
+```css
+.gray {
+  color: gray
+}
+
+@media (min-width: 320px) {
+  .button {
+    inherit: .gray;
+  }
+}
+
+@media (min-width: 320px) {
+  .link {
+    inherit: .gray;
+  }
+}
+```
+
+yields:
+
+```css
+.gray {
+  color: gray;
+}
+
+@media (min-width: 320px) {
+  .button,
+  .link {
+    color: gray;
+  }
+}
+```
+
+### Substitute for Nested Syntax
+
+Rework doesn't support nested syntax.
+However, you can simulate nested syntax with inheritance.
+
+```css
+.no-touchevents %link-hover:hover {
+  text-decoration: underline;
+}
+
+a,
+button {
+  inherit: %link-hover;
+}
+```
+
+yields:
+
+```css
+.no-touchevents a:hover,
+.no-touchevents button:hover {
+  text-decoration: underline;
+}
+```
+
+Thus, you have the features of nested syntax without the nesting.
+
+### Limitations
+
+* You can not inherit a rule that is inside a media query;
+  you can only inherit rules outside a media query.
+  If you find yourself in this situation,
+  just use placeholders instead.
