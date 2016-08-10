@@ -2,6 +2,7 @@
   "name": "postcss-inherit",
   "version": "2.0.0",
   "description": "PostCSS plugin inherit rules from other selectors",
+  "main": "./lib/index.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
     "compile-watch": "babel --watch -d lib/ src/",

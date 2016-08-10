@@ -1,14 +1,12 @@
 # PostCSS Inherit
 
-[![Build Status](https://travis-ci.org/GarthDB/postcss-inherit.svg?branch=master)](https://travis-ci.org/GarthDB/postcss-inherit) [![Code Climate](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/gpa.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit) [![Test Coverage](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/coverage.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit/coverage) [![Issue Count](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/issue_count.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit) [![Dependency Status](https://david-dm.org/GarthDB/postcss-inherit.svg)](https://david-dm.org/GarthDB/postcss-inherit) [![Inline docs](http://inch-ci.org/github/GarthDB/postcss-inherit.svg?branch=master)](http://inch-ci.org/github/GarthDB/postcss-inherit)
-
-[![NPM](https://nodei.co/npm/postcss-inherit.svg)](https://npmjs.org/package/postcss-inherit)
+[![Build Status](https://travis-ci.org/GarthDB/postcss-inherit.svg?branch=master)](https://travis-ci.org/GarthDB/postcss-inherit) [![Code Climate](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/gpa.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit) [![Test Coverage](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/coverage.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit/coverage) [![Issue Count](https://codeclimate.com/github/GarthDB/postcss-inherit/badges/issue_count.svg)](https://codeclimate.com/github/GarthDB/postcss-inherit) [![Dependency Status](https://david-dm.org/GarthDB/postcss-inherit.svg)](https://david-dm.org/GarthDB/postcss-inherit) [![Inline docs](http://inch-ci.org/github/GarthDB/postcss-inherit.svg?branch=master)](http://inch-ci.org/github/GarthDB/postcss-inherit) [![npm version](https://badge.fury.io/js/postcss-inherit.svg)](https://badge.fury.io/js/postcss-inherit)
 
 ---
 
-<img align="right" width="95" height="95"
+<a href="http://postcss.org/"><img align="right" width="95" height="95"
      title="Philosopher’s stone, logo of PostCSS"
-     src="http://postcss.github.io/postcss/logo.svg">
+     src="http://postcss.github.io/postcss/logo.svg"></a>
 
 Inherit mixin for [PostCSS](https://github.com/postcss/postcss). Allows you to inherit all the rules associated with a given selector. Modeled after [rework-inherit](https://github.com/reworkcss/rework-inherit).
 
