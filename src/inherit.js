@@ -1,6 +1,7 @@
 import postcss from 'postcss';
-const debug = require('debug')('postcss-inherit');
 import clone from './lib/clone';
+
+const debug = require('debug')('postcss-inherit');
 
 function isAtruleDescendant(node) {
   let { parent } = node;
@@ -46,6 +47,12 @@ function getRule(x) {
   return x.rule;
 }
 
+function isEmptyArray(x) {
+  if (!Array.isArray(x)) return true;
+  if (!x.length) return true;
+  if (x.length === 1 && x[0] === '') return true;
+  return false;
+}
 
 export default class Inherit {
   constructor(css, opts = {}) {
@@ -171,7 +178,7 @@ export default class Inherit {
   }
   appendSelectors(matchedRules, val, selectors) {
     matchedRules.rules.forEach((matchedRule) => {
-      if (!matchedRule.hasOwnProperty('selectors')) matchedRule.selectors = [];
+      if (!{}.hasOwnProperty.call(matchedRule, 'selectors')) matchedRule.selectors = [];
       matchedRule.selectors.forEach(matchedSelector => {
         matchedRule.rule.selectors = matchedRule.rule.selectors.concat(selectors.map((selector) =>
           replaceSelector(matchedSelector, val, selector)
@@ -189,7 +196,9 @@ export default class Inherit {
         (!~selector.indexOf('%'))
       );
       rule.selector = assembleSelectors(rule.selectors);
-      if (!selectors.length) rule.remove();
+      if (isEmptyArray(rule.selectors)) {
+        rule.remove();
+      }
       delete rule.selectors;
     });
   }

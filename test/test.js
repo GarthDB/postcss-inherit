@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-expressions */
+/* eslint import/no-extraneous-dependencies: ['error', {'devDependencies': true}] */
 import postcss from 'postcss';
 import chai from 'chai';
 import fs from 'fs';
 import importAt from 'postcss-import';
+import inherit from '../src/index';
 
 const expect = chai.expect;
-
-import inherit from '../src/index';
 
 function read(file) {
   return fs.readFileSync(`./test/fixtures/${file}.css`, 'utf8');
@@ -66,7 +66,7 @@ describe('postcss-inherit', () => {
   it('should sequence complex inheritance (e.g. .one.two%three)', (done) => {
     test(read('complex-sequence'), read('complex-sequence.out'), {}, done);
   });
-  it('should Extend regexp', (done) => {
+  it('should extend regexp', (done) => {
     test(read('extend'), read('chain.out'), { propertyRegExp: /^extends?$/ }, done);
   });
   it('should extend a class', (done) => {
@@ -83,5 +83,18 @@ describe('postcss-inherit', () => {
     .catch((error) => {
       done(error);
     });
+  });
+  it('should create a component', (done) => {
+    const inputcss = read('button');
+    const expectedOutput = read('button.out');
+    postcss([importAt(), inherit()])
+      .process(inputcss, { from: './test/fixtures/button.css' }).then((result) => {
+        expect(result.css.trim()).to.eql(expectedOutput.trim());
+        expect(result.warnings()).to.be.empty;
+        done();
+      })
+      .catch((error) => {
+        done(error);
+      });
   });
 });
