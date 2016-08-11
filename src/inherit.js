@@ -21,15 +21,23 @@ function isPlaceholder(val) {
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
-function replaceRegExp(val) {
-  const expression = `${escapeRegExp(val)}($|\\s|\\>|\\+|~|\\:|\\[)`;
+
+function matchRegExp(val) {
+  const result = val.replace(/\|/g, ':');
+  const expression = `${escapeRegExp(result)}($|\\s|\\>|\\+|~|\\:|\\[)`;
   let expressionPrefix = '(^|\\s|\\>|\\+|~)';
-  if (isPlaceholder(val)) {
+  if (isPlaceholder(result)) {
     // We just want to match an empty group here to preserve the arguments we
     // may be expecting in a RegExp match.
     expressionPrefix = '()';
   }
   return new RegExp(expressionPrefix + expression, 'g');
+}
+function replaceRegExp(val) {
+  const operatorRegex = /($|::?|\[)/g;
+  let result = val.replace(/\|/g, ':');
+  if (result.match(operatorRegex)) result = result.substring(0, result.search(operatorRegex));
+  return matchRegExp(result);
 }
 function replaceSelector(matchedSelector, val, selector) {
   return matchedSelector.replace(replaceRegExp(val), (_, first, last) =>
@@ -165,7 +173,7 @@ export default class Inherit {
     this.css.walkRules(rule => {
       if (!rule.selectors) return;
       const matchedSelectors = rule.selectors.filter(selector =>
-        selector.match(replaceRegExp(val))
+        selector.match(matchRegExp(val))
       );
       if (!matchedSelectors.length) return;
       matchedRules.rules.push({

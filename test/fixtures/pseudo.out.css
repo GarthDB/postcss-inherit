@@ -2,3 +2,8 @@
 .button--large:active {
   border: 1px solid blue;
 }
+
+.button::before,
+.button--quiet::before {
+  content: '';
+}

@@ -43,7 +43,7 @@ describe('postcss-inherit', () => {
     test(read('media'), read('media.out'), {}, done);
   });
   it('should inherit disjoint media', (done) => {
-    test(read('media'), read('media.out'), {}, done);
+    test(read('media.disjoint'), read('media.disjoint.out'), {}, done);
   });
   it('should inherit substring', (done) => {
     test(read('substring'), read('substring.out'), {}, done);
@@ -69,8 +69,11 @@ describe('postcss-inherit', () => {
   it('should extend regexp', (done) => {
     test(read('extend'), read('chain.out'), { propertyRegExp: /^extends?$/ }, done);
   });
-  it('should extend a class', (done) => {
+  it('should extend a basic class', (done) => {
     test(read('class'), read('class.out'), {}, done);
+  });
+  it('should extend a pseudo class', (done) => {
+    test(read('pseudo'), read('pseudo.out'), {}, done);
   });
   it('should work after another plugin', (done) => {
     const inputcss = read('import');
