@@ -237,36 +237,6 @@ yields:
 }
 ```
 
-### Substitute for Nested Syntax
-
-Rework doesn't support nested syntax.
-However, you can simulate nested syntax with inheritance.
-
-```css
-.no-touchevents %link-hover:hover {
-  text-decoration: underline;
-}
-
-a,
-button {
-  inherit: %link-hover;
-}
-```
-
-yields:
-
-```css
-.no-touchevents a:hover,
-.no-touchevents button:hover {
-  text-decoration: underline;
-}
-```
-
-Thus, you have the features of nested syntax without the nesting.
-
 ### Limitations
 
-* You can not inherit a rule that is inside a media query;
-  you can only inherit rules outside a media query.
-  If you find yourself in this situation,
-  just use placeholders instead.
+* You can not inherit a rule that is inside a media query; you can only inherit rules outside a media query. If you find yourself in this situation, just use placeholders instead.
