@@ -114,7 +114,6 @@ export default class Inherit {
     if (!matchedQueryRules.rules.length) {
       throw new Error(`Failed to extend as media query from ${val}.`);
     }
-
     debug('extend %j in @media %j with %j', selectors, query, val);
     this.appendSelectors(matchedQueryRules, val, selectors);
     return alreadyMatched
