@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import postcss from 'postcss';
 import clone from './lib/clone';
 
@@ -9,7 +10,7 @@ function isAtruleDescendant(node) {
 
   while (parent && parent.type !== 'root') {
     if (parent.type === 'atrule') {
-      descended = true;
+      descended = parent.params;
     }
     parent = parent.parent;
   }
@@ -23,10 +24,9 @@ function escapeRegExp(str) {
 }
 
 function matchRegExp(val) {
-  const result = val.replace(/\|/g, ':');
-  const expression = `${escapeRegExp(result)}($|\\s|\\>|\\+|~|\\:|\\[)`;
+  const expression = `${escapeRegExp(val)}((?:$|\\s|\\>|\\+|~|\\:|\\[)?)`;
   let expressionPrefix = '(^|\\s|\\>|\\+|~)';
-  if (isPlaceholder(result)) {
+  if (isPlaceholder(val)) {
     // We just want to match an empty group here to preserve the arguments we
     // may be expecting in a RegExp match.
     expressionPrefix = '()';
@@ -35,9 +35,8 @@ function matchRegExp(val) {
 }
 function replaceRegExp(val) {
   const operatorRegex = /($|::?|\[)/g;
-  let result = val.replace(/\|/g, ':');
-  if (result.match(operatorRegex)) result = result.substring(0, result.search(operatorRegex));
-  return matchRegExp(result);
+  const newVal = (val.match(operatorRegex)) ? val.substring(0, val.search(operatorRegex)) : val;
+  return matchRegExp(newVal);
 }
 function replaceSelector(matchedSelector, val, selector) {
   return matchedSelector.replace(replaceRegExp(val), (_, first, last) =>
@@ -50,163 +49,73 @@ function parseSelectors(selector) {
 function assembleSelectors(selectors) {
   return selectors.join(',\n');
 }
-
-function getRule(x) {
-  return x.rule;
-}
-
-function isEmptyArray(x) {
-  if (!Array.isArray(x)) return true;
-  if (!x.length) return true;
-  if (x.length === 1 && x[0] === '') return true;
-  return false;
+function sameQuery(nodeOne, nodeTwo) {
+  const atParamsOne = isAtruleDescendant(nodeOne);
+  const atParamsTwo = isAtruleDescendant(nodeTwo);
+  return (atParamsOne && atParamsOne === atParamsTwo);
 }
 
 export default class Inherit {
   constructor(css, opts = {}) {
-    this.css = css;
+    this.root = css;
     this.propertyRegExp = opts.propertyRegExp || /^(inherit|extend)s?$/i;
-    this.matches = {};
-    css.walkRules(rule => {
-      if (!isAtruleDescendant(rule)) {
-        rule.selectors = parseSelectors(rule.selector);
-        this.inheritRules(rule);
+    this.root.walkDecls(decl => {
+      if (this.propertyRegExp.test(decl.prop)) {
+        const rule = decl.parent;
+        parseSelectors(decl.value).forEach(value => {
+          this.inheritRule(value, rule);
+        });
+        decl.remove();
         if (!rule.nodes.length) rule.remove();
       }
     });
-    css.walkAtRules(atRule => {
-      this.inheritMedia(atRule);
-      if (!atRule.nodes.length) atRule.remove();
-    });
     this.removePlaceholders();
   }
-  inheritMedia(atRule) {
-    const query = atRule.params;
-    atRule.walkRules(rule => {
-      const newRules = this.inheritMediaRules(rule, query);
-      newRules.forEach((newRuleProperties) => {
-        const newRule = postcss.rule(newRuleProperties);
-        atRule.insertBefore(rule, newRule);
-        const spacerArray = newRule.raws.before.split('\n');
-        newRule.walkDecls(decl => {
-          decl.raws.before = `\n${spacerArray.join('')}${spacerArray.join('')}`;
-        });
-      });
-      if (!rule.nodes.length) rule.remove();
-    });
-  }
-  inheritMediaRules(rule, query) {
-    const selectors = rule.selectors = parseSelectors(rule.selector);
-    let appendRules = [];
-    rule.walkDecls(decl => {
-      if (!this.propertyRegExp.test(decl.prop)) return;
-      decl.value.split(',').map(x => x.trim()).forEach((val) => {
-        appendRules = appendRules.concat(this.inheritMediaRule(val, selectors, query));
-      });
-      decl.remove();
-    });
-    return appendRules;
-  }
-  inheritMediaRule(val, selectors, query) {
-    const matchedRules = this.matches[val] || this.matchRules(val);
-    const alreadyMatched = matchedRules.media[query];
-    const matchedQueryRules = alreadyMatched || this.matchQueryRule(val, query);
-    if (!matchedQueryRules.rules.length) {
-      throw new Error(`Failed to extend as media query from ${val}.`);
-    }
-    debug('extend %j in @media %j with %j', selectors, query, val);
-    this.appendSelectors(matchedQueryRules, val, selectors);
-    return alreadyMatched
-      ? []
-      : matchedQueryRules.rules.map(getRule);
-  }
-  matchQueryRule(val, query) {
-    const matchedRules = this.matches[val] || this.matchRules(val);
-    matchedRules.media[query] = {
-      media: query,
-      rules: matchedRules.rules.map(rule => {
-        const newRule = {
-          raws: {},
-          type: 'rule',
-          nodes: [],
-          selector: '',
-          selectors: [],
-        };
-        rule.rule.walkDecls(decl => {
-          newRule.nodes.push(clone(decl, newRule));
-        });
-        return {
-          selectors: rule.selectors,
-          declarations: rule.declarations,
-          rule: newRule,
-        };
-      }),
-    };
-    return matchedRules.media[query];
-  }
-  inheritRules(rule) {
-    const selectors = rule.selectors;
-    rule.walkDecls(decl => {
-      if (!this.propertyRegExp.test(decl.prop)) return;
-      decl.value.split(',').map(x => x.trim()).forEach((val) => {
-        this.inheritRule(val, selectors);
-      });
-      decl.remove();
-    });
-  }
-  inheritRule(val, selectors) {
-    const matchedRules = this.matches[val] || this.matchRules(val);
+  inheritRule(value, originRule) {
+    const originSelector = originRule.selector;
+    const originAtParams = isAtruleDescendant(originRule);
+    const targetSelector = value;
 
-    if (!matchedRules.rules.length) {
-      throw new Error(`Failed to extend from ${val}.`);
-    }
-
-    debug('extend %j with %j', selectors, val);
-    this.appendSelectors(matchedRules, val, selectors);
-  }
-  matchRules(val) {
-    const matchedRules = this.matches[val] = {
-      rules: [],
-      media: {},
-    };
-    this.css.walkRules(rule => {
-      if (!rule.selectors) return;
-      const matchedSelectors = rule.selectors.filter(selector =>
-        selector.match(matchRegExp(val))
-      );
-      if (!matchedSelectors.length) return;
-      matchedRules.rules.push({
-        selectors: matchedSelectors,
-        declarations: rule.nodes,
-        rule,
-      });
+    this.root.walkRules(rule => {
+      if (!matchRegExp(targetSelector).test(rule.selector)) return;
+      const targetRule = rule;
+      const targetAtParams = isAtruleDescendant(targetRule);
+      if (targetAtParams === originAtParams) {
+        this.appendSelector(originSelector, targetRule, targetSelector);
+      } else if (!targetAtParams) {
+        this.copyDeclarations(originRule, targetRule);
+      }
     });
-    return matchedRules;
   }
-  appendSelectors(matchedRules, val, selectors) {
-    matchedRules.rules.forEach((matchedRule) => {
-      if (!{}.hasOwnProperty.call(matchedRule, 'selectors')) matchedRule.selectors = [];
-      matchedRule.selectors.forEach(matchedSelector => {
-        matchedRule.rule.selectors = matchedRule.rule.selectors.concat(selectors.map((selector) =>
-          replaceSelector(matchedSelector, val, selector)
-        ));
-      });
-      matchedRule.rule.selector = assembleSelectors(matchedRule.rule.selectors);
+  appendSelector(originSelector, targetRule, value) {
+    const originSelectors = parseSelectors(originSelector);
+    let targetRuleSelectors = parseSelectors(targetRule.selector);
+    targetRuleSelectors.forEach(targetRuleSelector => {
+      [].push.apply(targetRuleSelectors, originSelectors.map(newOriginSelector =>
+        replaceSelector(targetRuleSelector, value, newOriginSelector)
+      ));
+    });
+    // removes duplicate selectors
+    targetRuleSelectors = [...new Set(targetRuleSelectors)];
+    targetRule.selector = assembleSelectors(targetRuleSelectors);
+  }
+  copyDeclarations(originRule, targetRule) {
+    targetRule.nodes.forEach(node => {
+      const newNode = clone(node);
+      newNode.moveTo(originRule);
     });
   }
   removePlaceholders() {
-    const css = this.css;
-    css.walkRules(rule => {
-      const selectors = rule.selectors;
-      if (!selectors) return;
-      rule.selectors = rule.selectors.filter(selector =>
+    this.root.walkRules(/%/, rule => {
+      const selectors = parseSelectors(rule.selector);
+      const newSelectors = selectors.filter(selector =>
         (!~selector.indexOf('%'))
       );
-      rule.selector = assembleSelectors(rule.selectors);
-      if (isEmptyArray(rule.selectors)) {
+      if (!newSelectors.length) {
         rule.remove();
+      } else {
+        rule.selector = assembleSelectors(newSelectors);
       }
-      delete rule.selectors;
     });
   }
 }

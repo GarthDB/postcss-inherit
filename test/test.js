@@ -4,6 +4,7 @@ import postcss from 'postcss';
 import chai from 'chai';
 import fs from 'fs';
 import importAt from 'postcss-import';
+import inheritParser from 'postcss-inherit-parser';
 import inherit from '../src/index';
 
 const expect = chai.expect;
@@ -13,19 +14,23 @@ function read(file) {
 }
 
 function test(input, output, opts, done) {
-  postcss([inherit(opts)]).process(input).then((result) => {
-    expect(result.css.trim()).to.eql(output.trim());
-    expect(result.warnings()).to.be.empty;
-    done();
-  })
-  .catch((error) => {
-    done(error);
-  });
+  postcss([inherit(opts)])
+    .process(input, { parser: inheritParser }).then((result) => {
+      expect(result.css.trim()).to.eql(output.trim());
+      expect(result.warnings()).to.be.empty;
+      done();
+    })
+    .catch((error) => {
+      done(error);
+    });
 }
 
 describe('postcss-inherit', () => {
   it('should handle a placeholder', (done) => {
     test(read('placeholder').trim(), read('placeholder.out').trim(), {}, done);
+  });
+  it('should extend a basic class', (done) => {
+    test(read('class'), read('class.out'), {}, done);
   });
   it('should handle attribute selectors', (done) => {
     test(read('attribute').trim(), read('attribute.out').trim(), {}, done);
@@ -68,9 +73,6 @@ describe('postcss-inherit', () => {
   });
   it('should extend regexp', (done) => {
     test(read('extend'), read('chain.out'), { propertyRegExp: /^extends?$/ }, done);
-  });
-  it('should extend a basic class', (done) => {
-    test(read('class'), read('class.out'), {}, done);
   });
   it('should extend a pseudo class', (done) => {
     test(read('pseudo'), read('pseudo.out'), {}, done);
