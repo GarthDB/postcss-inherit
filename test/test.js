@@ -4,6 +4,7 @@ import postcss from 'postcss';
 import chai from 'chai';
 import fs from 'fs';
 import importAt from 'postcss-import';
+import perfectionist from 'perfectionist';
 import inheritParser from 'postcss-inherit-parser';
 import inherit from '../src/index';
 
@@ -14,7 +15,10 @@ function read(file) {
 }
 
 function test(input, output, opts, done) {
-  postcss([inherit(opts)])
+  postcss([
+    inherit(opts),
+    perfectionist({ indentSize: 2, maxAtRuleLength: false, maxSelectorLength: 1 }),
+  ])
     .process(input, { parser: inheritParser }).then((result) => {
       expect(result.css.trim()).to.eql(output.trim());
       expect(result.warnings()).to.be.empty;

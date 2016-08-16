@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
-import postcss from 'postcss';
-import clone from './lib/clone';
+import clone from './clone';
 
 const debug = require('debug')('postcss-inherit');
 
@@ -43,49 +41,107 @@ function replaceSelector(matchedSelector, val, selector) {
     first + selector + last
   );
 }
+function makePlaceholder(selector, value) {
+  return selector.replace(replaceRegExp(value), (_, first, last) =>
+    `%${_}${first}${last}`
+  );
+}
 function parseSelectors(selector) {
   return selector.split(',').map(x => x.trim());
 }
 function assembleSelectors(selectors) {
   return selectors.join(',\n');
 }
-function sameQuery(nodeOne, nodeTwo) {
-  const atParamsOne = isAtruleDescendant(nodeOne);
-  const atParamsTwo = isAtruleDescendant(nodeTwo);
-  return (atParamsOne && atParamsOne === atParamsTwo);
+function mediaMatch(object, key, value) {
+  if (!{}.hasOwnProperty.call(object, key)) {
+    return false;
+  }
+  return ~object[key].indexOf(value);
 }
-
+function removeParentsIfEmpty(node) {
+  let currentNode = node.parent;
+  node.remove();
+  while (!currentNode.nodes.length) {
+    const parent = currentNode.parent;
+    currentNode.remove();
+    currentNode = parent;
+  }
+}
 export default class Inherit {
   constructor(css, opts = {}) {
     this.root = css;
+    this.matches = {};
     this.propertyRegExp = opts.propertyRegExp || /^(inherit|extend)s?$/i;
+    this.root.walkAtRules(atRule => {
+      this.atRuleInheritsFromRoot(atRule);
+    });
     this.root.walkDecls(decl => {
       if (this.propertyRegExp.test(decl.prop)) {
         const rule = decl.parent;
         parseSelectors(decl.value).forEach(value => {
-          this.inheritRule(value, rule);
+          this.inheritRule(value, rule, decl);
         });
-        decl.remove();
-        if (!rule.nodes.length) rule.remove();
+        removeParentsIfEmpty(decl);
       }
     });
     this.removePlaceholders();
   }
-  inheritRule(value, originRule) {
+  atRuleInheritsFromRoot(atRule) {
+    atRule.walkDecls(decl => {
+      if (this.propertyRegExp.test(decl.prop)) {
+        const originRule = decl.parent;
+        const originAtParams = isAtruleDescendant(originRule);
+        const newValueArray = [];
+        parseSelectors(decl.value).forEach(value => {
+          const targetSelector = value;
+          let newValue = value;
+          this.root.walkRules(rule => {
+            if (!matchRegExp(targetSelector).test(rule.selector)) return;
+            const targetAtParams = isAtruleDescendant(rule);
+            if (!targetAtParams) {
+              newValue = `%${value}`;
+            } else {
+              return;
+            }
+            if (!mediaMatch(this.matches, originAtParams, targetSelector)) {
+              const newRule = this.copyRule(originRule, rule);
+              newRule.selector = makePlaceholder(newRule.selector, targetSelector);
+              this.matches[originAtParams] = this.matches[originAtParams] || [];
+              this.matches[originAtParams].push(targetSelector);
+              this.matches[originAtParams] = [...new Set(this.matches[originAtParams])];
+            }
+          });
+          newValueArray.push(newValue);
+        });
+        decl.value = newValueArray.join(', ');
+      }
+    });
+  }
+  inheritRule(value, originRule, decl) {
     const originSelector = originRule.selector;
-    const originAtParams = isAtruleDescendant(originRule);
+    const originAtParams = originRule.atParams || isAtruleDescendant(originRule);
     const targetSelector = value;
-
+    let matched = false;
+    let differentLevelMatched = false;
     this.root.walkRules(rule => {
       if (!matchRegExp(targetSelector).test(rule.selector)) return;
       const targetRule = rule;
-      const targetAtParams = isAtruleDescendant(targetRule);
+      const targetAtParams = targetRule.atParams || isAtruleDescendant(targetRule);
       if (targetAtParams === originAtParams) {
+        debug('extend %j with %j', originSelector, targetSelector);
         this.appendSelector(originSelector, targetRule, targetSelector);
-      } else if (!targetAtParams) {
-        this.copyDeclarations(originRule, targetRule);
+        matched = true;
+      } else {
+        differentLevelMatched = true;
       }
     });
+    if (!matched) {
+      if (differentLevelMatched) {
+        throw decl.error(`Could not find rule that matched ${value} in the same atRule.`);
+      } else {
+        throw decl.error(`Could not find rule that matched ${value}.`);
+      }
+    }
   }
   appendSelector(originSelector, targetRule, value) {
     const originSelectors = parseSelectors(originSelector);
@@ -99,11 +155,10 @@ export default class Inherit {
     targetRuleSelectors = [...new Set(targetRuleSelectors)];
     targetRule.selector = assembleSelectors(targetRuleSelectors);
   }
-  copyDeclarations(originRule, targetRule) {
-    targetRule.nodes.forEach(node => {
-      const newNode = clone(node);
-      newNode.moveTo(originRule);
-    });
+  copyRule(originRule, targetRule) {
+    const newRule = clone(targetRule);
+    newRule.moveBefore(originRule);
+    return newRule;
   }
   removePlaceholders() {
     this.root.walkRules(/%/, rule => {
