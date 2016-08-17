@@ -14,12 +14,9 @@
     "no-param-reassign": [2, {
       "props": false
     }],
-    "chai-expect/missing-assertion": 2,
-    "chai-expect/terminating-properties": 1,
-    "react/require-extension": 0,
+    import/no-extraneous-dependencies: ['error', {'devDependencies': true}]
   },
   "plugins": [
-    "chai-expect",
     "import",
   ],
 }

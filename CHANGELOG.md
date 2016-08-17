@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 
 * fixed pseudo class issue and updated test.
+* rewrote plugin to use postcss api better.
+* switched tests to ava.
 
 ## [2.0.3] - 2016-08-10
 
