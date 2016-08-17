@@ -22,7 +22,7 @@ function escapeRegExp(str) {
 }
 
 function matchRegExp(val) {
-  const expression = `${escapeRegExp(val)}((?:$|\\s|\\>|\\+|~|\\:|\\[)?)`;
+  const expression = `${escapeRegExp(val)}($|\\s|\\>|\\+|~|\\:|\\[)`;
   let expressionPrefix = '(^|\\s|\\>|\\+|~)';
   if (isPlaceholder(val)) {
     // We just want to match an empty group here to preserve the arguments we
@@ -66,6 +66,13 @@ function removeParentsIfEmpty(node) {
     currentNode.remove();
     currentNode = parent;
   }
+}
+function findInArray(array, regex) {
+  let result = -1;
+  array.forEach((value, index) => {
+    if (regex.test(value)) result = index;
+  });
+  return result;
 }
 export default class Inherit {
   constructor(css, opts = {}) {
@@ -124,7 +131,7 @@ export default class Inherit {
     let matched = false;
     let differentLevelMatched = false;
     this.root.walkRules(rule => {
-      if (!matchRegExp(targetSelector).test(rule.selector)) return;
+      if (!~findInArray(parseSelectors(rule.selector), matchRegExp(targetSelector))) return;
       const targetRule = rule;
       const targetAtParams = targetRule.atParams || isAtruleDescendant(targetRule);
       if (targetAtParams === originAtParams) {

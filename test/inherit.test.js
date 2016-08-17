@@ -121,16 +121,19 @@ test('should extend regexp', t => {
 });
 
 test('should throw an error when missing a selector', t => {
-  t.throws(runInherit(read('missing-selector')), /Could not find rule that matched %poop\./);
+  t.throws(runInherit(read('missing-selector')), /Could not find rule that matched %form\./);
 });
 
 test('should throw an error when atrules don\'t match', t => {
-  t.throws(runInherit(read('mismatch-atrules')), /Could not find rule that matched \.gray in the same atRule\./);
+  t.throws(
+    runInherit(read('mismatch-atrules')),
+    /Could not find rule that matched \.gray in the same atRule\./
+  );
 });
 
 test('should work after another plugin', t => {
   const inputcss = read('import');
-  const expectedOutput = read('import.out');
+  const output = read('import.out');
   postcss([importAt(), inherit()]).process(inputcss)
   .then((result) => {
     t.deepEqual(result.css.trim(), output);
@@ -140,11 +143,11 @@ test('should work after another plugin', t => {
 
 test('should create a component', t => {
   const inputcss = read('button');
-  const expectedOutput = read('button.out');
+  const output = read('button.out');
   postcss([importAt(), inherit()])
     .process(inputcss, { from: './test/fixtures/button.css' })
     .then((result) => {
-      t.deepEqual(result.css.trim(), expectedOutput);
+      t.deepEqual(result.css.trim(), output);
     })
     .catch(console.log);
 });
