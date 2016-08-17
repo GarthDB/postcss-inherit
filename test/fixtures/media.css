@@ -7,3 +7,9 @@
     inherit: .gray;
   }
 }
+
+@media (min-width: 320px) {
+  .new-button {
+    inherit: .button;
+  }
+}

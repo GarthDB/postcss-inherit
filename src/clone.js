@@ -4,9 +4,9 @@ const clone = (obj, parent) => {
   }
   const cloned = new obj.constructor();
   Object.keys(obj).forEach(i => {
-    if (!({}.hasOwnProperty.call(obj, i))) {
-      return;
-    }
+    // if (!({}.hasOwnProperty.call(obj, i))) {
+    //   return;
+    // }
     const value = obj[i];
     if (i === 'parent' && typeof value === 'object') {
       if (parent) {

@@ -1,10 +1,9 @@
-.gray {
-  color: gray;
+.button {
+  inherit: .gray;
 }
 
 @media (min-width: 320px) {
-  .button,
-  .new-button {
+  .gray {
     color: gray;
   }
 }

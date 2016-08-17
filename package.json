@@ -1,14 +1,12 @@
 {
   "name": "postcss-inherit",
-  "version": "2.0.3",
+  "version": "3.0.0",
   "description": "PostCSS plugin inherit rules from other selectors",
   "main": "./lib/index.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
-    "compile-watch": "babel --watch -d lib/ src/",
     "prepublish": "npm run compile",
-    "test": "mocha test",
-    "test-watch": "multi='mocha-osx-reporter=- nyan=-' mocha --watch --reporter mocha-multi test/",
+    "test": "ava",
     "coverage": "nyc npm test",
     "codeclimate": "npm run coverage && nyc report --reporter=text-lcov | codeclimate-test-reporter",
     "lint": "eslint --ignore-path .gitignore ."
@@ -24,10 +22,15 @@
     "inherit",
     "extend"
   ],
+  "ava": {
+    "require": [
+      "babel-register"
+    ],
+    "babel": "inherit"
+  },
   "nyc": {
-    "exclude": [
-      "lib",
-      "test"
+    "include": [
+      "src/*.js"
     ],
     "require": [
       "babel-register"
@@ -41,26 +44,25 @@
   "homepage": "https://github.com/topmarks/topmarks#readme",
   "dependencies": {
     "debug": "^2.2.0",
-    "postcss": "^5.0.10"
+    "postcss": "^5.0.10",
+    "postcss-inherit-parser": "^0.1.3"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.1",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-istanbul": "^2.0.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-register": "^6.11.6",
-    "chai": "^3.5.0",
     "codeclimate-test-reporter": "^0.3.3",
     "eslint": "^3.2.2",
     "eslint-config-airbnb": "^10.0.0",
-    "eslint-plugin-chai-expect": "^1.1.1",
     "eslint-plugin-import": "^1.12.0",
     "eslint-plugin-jsx-a11y": "^2.1.0",
     "eslint-plugin-react": "^6.0.0",
-    "mocha": "^3.0.0",
-    "mocha-multi": "^0.9.0",
-    "mocha-osx-reporter": "^0.1.2",
-    "nyc": "^8.0.0",
+    "ava": "^0.16.0",
+    "nyc": "^8.1.0",
+    "perfectionist": "^2.1.4",
     "postcss-import": "^8.1.2",
     "topcoat-utils": "^0.4.0"
   }
