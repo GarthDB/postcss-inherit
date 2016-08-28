@@ -2,6 +2,19 @@ import clone from './clone';
 
 const debug = require('debug')('postcss-inherit');
 
+/**
+ * Private: checks if a node is a decendant of an [AtRule](http://api.postcss.org/AtRule.html).
+ *
+ * * `node` {Object} PostCSS Node to check.
+ *
+ * ## Example
+ *
+ *    const atRule = postcss.parse('@media (min-width: 480px) {a{}}').first;
+ *    const rule = atRule.first;
+ *    isAtruleDescendant(rule); // returns '(min-width: 480px)'
+ *
+ * Returns {Boolean} of false, or {String} of AtRule params if true.
+ */
 function isAtruleDescendant(node) {
   let { parent } = node;
   let descended = false;
@@ -14,6 +27,18 @@ function isAtruleDescendant(node) {
   }
   return descended;
 }
+/**
+ * Private: checks string to see if it has the placeholder syntax (starts with %)
+ *
+ * * `val` a {String} intended for inherit value or rule name.
+ *
+ * ## Example
+ *
+ *    const ruleName = '%placeholder';
+ *    isPlaceholder(ruleName); // returns true
+ *
+ * Returns {Boolean}
+ */
 function isPlaceholder(val) {
   return val[0] === '%';
 }

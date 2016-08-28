@@ -36,7 +36,7 @@
       "babel-register"
     ]
   },
-  "author": "garthdb <garthdb@gmail.com> (http://garthdb.com)",
+  "author": "Garth Braithwaite <garthdb@gmail.com> (http://garthdb.com)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/garthdb/postcss-inherit/issues"
