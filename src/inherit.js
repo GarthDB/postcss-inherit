@@ -42,10 +42,32 @@ function isAtruleDescendant(node) {
 function isPlaceholder(val) {
   return val[0] === '%';
 }
+/**
+ * Private: gets a string ready to use in a regular expression.
+ *
+ * * `str` {String} to escape RegExp reserved characters.
+ *
+ * ## Example
+ *
+ *    escapeRegExp('div[class^="top"]::before'); // returns div\[class\^="top"\]::before
+ *
+ * Returns {String} for use in a regualr expression.
+ */
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
-
+/**
+ * Private: creates a regular expression used to find rules that match inherit property.
+ *
+ * * `val` {String} inherit property to use to find selectors that contain it.
+ *
+ * ## Example
+ *
+ *    matchRegExp('div[class^="top"]::before');
+ *    // returns /(^|\s|\>|\+|~)div\[class\^="top"\]::before($|\s|\>|\+|~|\:|\[)/g
+ *
+ * Returns {RegExp} used for finding rules that match inherit property.
+ */
 function matchRegExp(val) {
   const expression = `${escapeRegExp(val)}($|\\s|\\>|\\+|~|\\:|\\[)`;
   let expressionPrefix = '(^|\\s|\\>|\\+|~)';
