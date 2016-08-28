@@ -78,12 +78,40 @@ function matchRegExp(val) {
   }
   return new RegExp(expressionPrefix + expression, 'g');
 }
+/**
+ * Private: creates a regular expression used to replace selector with inherit property inserted
+ *
+ * * `val` {String} inherit property to use to replace selectors that contain it.
+ *
+ * ## Example
+ *
+ *    replaceRegExp
+ *
+ * Returns {RegExp} used to replace selector with inherit property inserted
+ */
 function replaceRegExp(val) {
   const operatorRegex = /($|::?|\[)/g;
   const newVal = (val.match(operatorRegex)) ? val.substring(0, val.search(operatorRegex)) : val;
   return matchRegExp(newVal);
 }
+/**
+ * Private: replaces selector with inherit property inserted.
+ *
+ * * `matchedSelector` {String} selector of the rule that matches the inherit value
+ * * `val` {String} value of the inherit property
+ * * `selector` {String} selector of the rule that contains the inherit declaration.
+ *
+ * ## Example
+ *
+ *    replaceSelector('.button-group %dark-button', '%dark-button', '.some-button');
+ *    // returns '.button-group .some-button'
+ *
+ * Returns {String} new selector.
+ */
 function replaceSelector(matchedSelector, val, selector) {
+  console.log(`matchedSelector ${matchedSelector}`);
+  console.log(`val ${val}`);
+  console.log(`selector ${selector}`);
   return matchedSelector.replace(replaceRegExp(val), (_, first, last) =>
     first + selector + last
   );
