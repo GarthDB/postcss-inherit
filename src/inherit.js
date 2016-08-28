@@ -109,30 +109,91 @@ function replaceRegExp(val) {
  * Returns {String} new selector.
  */
 function replaceSelector(matchedSelector, val, selector) {
-  console.log(`matchedSelector ${matchedSelector}`);
-  console.log(`val ${val}`);
-  console.log(`selector ${selector}`);
   return matchedSelector.replace(replaceRegExp(val), (_, first, last) =>
     first + selector + last
   );
 }
+/**
+ * Private: turns a portion of a selector into a placeholder (adding a %)
+ *
+ * * `selector` {String} of the selector to replace
+ * * `value` {String} portion of the selector to convert into a placeholder
+ *
+ * ## Example
+ *
+ *    makePlaceholder('.gray button', '.gray')
+ *    // returns %.gray button
+ *
+ * Returns the transformed selector string {String}
+ */
 function makePlaceholder(selector, value) {
   return selector.replace(replaceRegExp(value), (_, first, last) =>
-    `%${_}${first}${last}`
+    `${first}%${_.trim()}${last}`
   );
 }
+/**
+ * Private: splits selectors divided by a comma
+ *
+ * * `selector` {String} comma delimited selectors.
+ *
+ * ## Example
+ *
+ *    parseSelectors('.button-cta,.button');
+ *    //returns ['.button-cta','.button']
+ *
+ * Returns {Array} of selector {Strings}
+ */
 function parseSelectors(selector) {
   return selector.split(',').map(x => x.trim());
 }
+/**
+ * Private: reassembles an array of selectors, usually split by `parseSelectors`
+ *
+ * * `selectors` {Array} of selector {Strings}
+ *
+ * ## Example
+ *
+ *    parseSelectors(['.button-cta','.button']);
+ *    // returns '.button-cta,\n.button'
+ *
+ * Returns selector {String}
+ */
 function assembleSelectors(selectors) {
   return selectors.join(',\n');
 }
+/**
+ * Private: checks if value is already contained in a nested object.
+ *
+ * * `object` {Object} that might contain the value
+ * * `key` {String} key of the nested object that might contain the value
+ * * `value` {String} to check for
+ *
+ * ## Example
+ *
+ *    const obj = {'(min-width: 320px)':['.gray']};
+ *    mediaMatch(obj, '(min-width: 320px)', value);
+ *    //returns true
+ *
+ * Returns {Boolean}
+ */
 function mediaMatch(object, key, value) {
   if (!{}.hasOwnProperty.call(object, key)) {
     return false;
   }
-  return ~object[key].indexOf(value);
+  return Boolean(~object[key].indexOf(value));
 }
+/**
+ * Private: removes PostCSS Node and all parents if left empty after removal.
+ *
+ * * `node` {Object} PostCSS Node to check.
+ *
+ * ## Example
+ *
+ *    const atRule = postcss.parse('@media (min-width: 480px) {a{}}').first;
+ *    const rule = atRule.first;
+ *    removeParentsIfEmpty(rule);
+ *    // removes `rule` and `atRule`
+ */
 function removeParentsIfEmpty(node) {
   let currentNode = node.parent;
   node.remove();
@@ -142,6 +203,21 @@ function removeParentsIfEmpty(node) {
     currentNode = parent;
   }
 }
+/**
+ * Private: use a regex to see if something is contained in array values.
+ *
+ * * `array` {Array} that might contain a match
+ * * `regex` {RegExp} used to test values of `array`
+ *
+ * ## Example
+ *
+ *    const arr = [ '%icon', '.red-icon', '.blue-icon' ];
+ *    const regex = /()%icon($|\s|\>|\+|~|\:|\[)/g;
+ *    findInArray(array, regex);
+ *    // returns 0
+ *
+ * Returns {Int} index of array that matched.
+ */
 function findInArray(array, regex) {
   let result = -1;
   array.forEach((value, index) => {
@@ -149,7 +225,26 @@ function findInArray(array, regex) {
   });
   return result;
 }
+/**
+ * Topmark Class
+ */
 export default class Inherit {
+  /**
+   * Public: Inherit class constructor
+   *
+   * `css` {Object} PostCSS AST that will be transformed by the inherit plugin
+   * `opts` {Object} of inherit plugin specific options
+   *
+   * ## Example
+   *
+   *    export default postcss.plugin('postcss-inherit',
+   *      (opts = {}) =>
+   *        (css) =>
+   *          new Inherit(css, opts)
+   *    );
+   *
+   * Does not return a value, but it transforms the PostCSS AST.
+   */
   constructor(css, opts = {}) {
     this.root = css;
     this.matches = {};
@@ -168,6 +263,19 @@ export default class Inherit {
     });
     this.removePlaceholders();
   }
+  /**
+   * Private: copies rules from root when inherited in an atRule descendant
+   *
+   * * `atRule` {Object} PostCSS AtRule
+   *
+   * ## Example
+   *
+   *    this.root.walkAtRules(atRule => {
+   *      this.atRuleInheritsFromRoot(atRule);
+   *    });
+   *
+   * Does not return a value, but it transforms the PostCSS AST.
+   */
   atRuleInheritsFromRoot(atRule) {
     atRule.walkDecls(decl => {
       if (this.propertyRegExp.test(decl.prop)) {
@@ -199,6 +307,15 @@ export default class Inherit {
       }
     });
   }
+  /**
+   * Private: Finds selectors that match value and add the selector for the originRule as needed.
+   *
+   * * `value` {String} inherit declaration value
+   * * `originRule` {Object} PostCSS Rule
+   * * `decl` {Object} PostCSS Declaration
+   *
+   * Does not return a value, but it transforms the PostCSS AST.
+   */
   inheritRule(value, originRule, decl) {
     const originSelector = originRule.selector;
     const originAtParams = originRule.atParams || isAtruleDescendant(originRule);
