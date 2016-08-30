@@ -1,3 +1,16 @@
+/**
+ * Public: clones a PostCSS node.
+ *
+ * * `obj` {Object} PostCSS node to be cloned.
+ * * `parent` {Object} PostCSS node of new parent node where node will be moved to.
+ *
+ * ## Example
+ *
+ *    const newRule = clone(targetRule);
+ *    newRule.moveBefore(originRule);
+ *
+ * Returns {Object} PostCSS node instance of the new cloned node.
+ */
 const clone = (obj, parent) => {
   if (typeof obj !== 'object' || obj === null) {
     return obj;
