@@ -1,5 +1,3 @@
-import clone from './clone';
-
 const debug = require('debug')('postcss-inherit');
 
 /**
@@ -422,7 +420,7 @@ export default class Inherit {
    * Does not return a value, but it transforms the PostCSS AST.
    */
   copyRule(originRule, targetRule) {
-    const newRule = clone(targetRule);
+    const newRule = targetRule.cloneBefore();
     newRule.moveBefore(originRule);
     return newRule;
   }
