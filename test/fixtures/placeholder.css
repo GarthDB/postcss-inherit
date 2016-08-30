@@ -2,6 +2,10 @@
   cursor: not-allowed;
 }
 
+%extra-placeholder {
+  cursor: pointer;
+}
+
 input {
   inherit: %form-element;
 }

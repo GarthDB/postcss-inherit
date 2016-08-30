@@ -8,7 +8,7 @@
      title="Philosopher’s stone, logo of PostCSS"
      src="http://postcss.github.io/postcss/logo.svg"></a>
 
-Inherit mixin for [PostCSS](https://github.com/postcss/postcss). Allows you to inherit all the rules associated with a given selector. Modeled after [rework-inherit](https://github.com/reworkcss/rework-inherit).
+Inherit plugin for [PostCSS](https://github.com/postcss/postcss). Allows you to inherit all the rules associated with a given selector. Modeled after [rework-inherit](https://github.com/reworkcss/rework-inherit).
 
 ## API
 

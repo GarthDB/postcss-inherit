@@ -1,0 +1,8 @@
+.red {
+  color: red;
+
+  .gray,
+  .button {
+    color: gray;
+  }
+}

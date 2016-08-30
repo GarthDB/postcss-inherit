@@ -23,97 +23,113 @@ test('should handle a placeholder', t => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should extend a basic class', t => {
   const output = read('class.out');
   return runInherit(read('class')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should handle attribute selectors', t => {
   const output = read('attribute.out');
   return runInherit(read('attribute')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should clearfix', t => {
   const output = read('clearfix.out');
   return runInherit(read('clearfix')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should clearfix zoom', t => {
   const output = read('clearfix.zoom.out');
   return runInherit(read('clearfix.zoom')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should combine inherits', t => {
   const output = read('combined.out');
   return runInherit(read('combined')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should inherit through media', t => {
   const output = read('media.out');
   return runInherit(read('media')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should inherit disjoint media', t => {
   const output = read('media.disjoint.out');
   return runInherit(read('media.disjoint')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should inherit substring', t => {
   const output = read('substring.out');
   return runInherit(read('substring')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should inherit multiple selectors', t => {
   const output = read('multiple.out');
   return runInherit(read('multiple')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should inherit a tag', t => {
   const output = read('tag.out');
   return runInherit(read('tag')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should chain inheritance', t => {
   const output = read('chain.out');
   return runInherit(read('chain')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should inherit out of order', t => {
   const output = read('unordered.out');
   return runInherit(read('unordered')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should sequence inheritance (e.g. .one.two%three)', t => {
   const output = read('sequence.out');
   return runInherit(read('sequence')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should sequence complex inheritance (e.g. .one.two%three)', t => {
   const output = read('complex-sequence.out');
   return runInherit(read('complex-sequence')).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
 test('should extend regexp', t => {
   const output = read('chain.out');
   return runInherit(read('extend'), { propertyRegExp: /^extends?$/ }).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
-test('should extend regexp', t => {
+
+test('should extend pseudo class', t => {
   const output = read('pseudo.out');
   return runInherit(read('pseudo')).then(result => {
     t.deepEqual(result.css.trim(), output);
@@ -150,4 +166,11 @@ test('should create a component', t => {
       t.deepEqual(result.css.trim(), output);
     })
     .catch(console.log);
+});
+
+test('should process nested rules', t => {
+  const output = read('nested-rules.out');
+  return runInherit(read('nested-rules')).then(result => {
+    t.deepEqual(result.css.trim(), output);
+  });
 });

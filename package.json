@@ -1,19 +1,16 @@
 {
   "name": "postcss-inherit",
-  "version": "3.0.0",
   "description": "PostCSS plugin inherit rules from other selectors",
   "main": "./lib/index.js",
   "scripts": {
-    "compile": "babel -d lib/ src/",
-    "prepublish": "npm run compile",
-    "test": "ava",
-    "coverage": "nyc npm test",
-    "codeclimate": "npm run coverage && nyc report --reporter=text-lcov | codeclimate-test-reporter",
-    "lint": "eslint --ignore-path .gitignore ."
+    "start": "package-scripts",
+    "test": "package-scripts test",
+    "prepublish": "package-scripts build",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/garthdb/postcss-inherit.git"
+    "url": "https://github.com/GarthDB/postcss-inherit.git"
   },
   "keywords": [
     "postcss",
@@ -36,7 +33,7 @@
       "babel-register"
     ]
   },
-  "author": "garthdb <garthdb@gmail.com> (http://garthdb.com)",
+  "author": "Garth Braithwaite <garthdb@gmail.com> (http://garthdb.com)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/garthdb/postcss-inherit/issues"
@@ -48,6 +45,7 @@
     "postcss-inherit-parser": "^0.1.3"
   },
   "devDependencies": {
+    "ava": "^0.16.0",
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.1",
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -55,15 +53,24 @@
     "babel-preset-es2015": "^6.9.0",
     "babel-register": "^6.11.6",
     "codeclimate-test-reporter": "^0.3.3",
+    "codecov": "^1.0.1",
+    "commitizen": "^2.8.6",
+    "cz-conventional-changelog": "^1.2.0",
     "eslint": "^3.2.2",
     "eslint-config-airbnb": "^10.0.0",
     "eslint-plugin-import": "^1.12.0",
     "eslint-plugin-jsx-a11y": "^2.1.0",
     "eslint-plugin-react": "^6.0.0",
-    "ava": "^0.16.0",
     "nyc": "^8.1.0",
+    "p-s": "^2.4.3",
     "perfectionist": "^2.1.4",
     "postcss-import": "^8.1.2",
+    "semantic-release": "^4.3.5",
     "topcoat-utils": "^0.4.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

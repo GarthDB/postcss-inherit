@@ -1,0 +1,10 @@
+.red {
+  color: red;
+  .gray {
+    color: gray;
+  }
+}
+
+.button {
+  inherit: .gray;
+}

@@ -7,3 +7,5 @@ npm-debug.log*
 /lib
 /bin
 inch.json
+/coverage
+/.nyc_output
