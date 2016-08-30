@@ -224,7 +224,7 @@ function findInArray(array, regex) {
   return result;
 }
 /**
- * Topmark Class
+ * Inherit Class
  */
 export default class Inherit {
   /**
