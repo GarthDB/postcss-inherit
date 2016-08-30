@@ -311,8 +311,20 @@ export default class Inherit {
    * Private: Finds selectors that match value and add the selector for the originRule as needed.
    *
    * * `value` {String} inherit declaration value
-   * * `originRule` {Object} PostCSS Rule
-   * * `decl` {Object} PostCSS Declaration
+   * * `originRule` {Object} the PostCSS Rule that contains the inherit declaration
+   * * `decl` {Object} the original inherit PostCSS Declaration
+   *
+   * ## Example
+   *
+   * `originRule` css:
+   *
+   *    .button {
+   *      inherit: .gray; // decl
+   *    }
+   *
+   *    this.inheritRule('.gray', {originRule Obj}, {decl Obj});
+   *
+   * Adds `.button` class to matching rule for `.gray`.
    *
    * Does not return a value, but it transforms the PostCSS AST.
    */
@@ -342,6 +354,20 @@ export default class Inherit {
       }
     }
   }
+  /**
+   * Private: appends selector from originRule to matching rules.
+   *
+   * * `originSelector` {String} selector from originRule to append
+   * * `targetRule` {Object} PostCSS Rule that matched value.
+   *   Will have originSelector appended to it
+   * * `value` {String} inherit declaration value
+   *
+   * ## Example
+   *
+   *    this.appendSelector(originSelector, targetRule, targetSelector);
+   *
+   * Does not return a value, but it transforms the PostCSS AST.
+   */
   appendSelector(originSelector, targetRule, value) {
     const originSelectors = parseSelectors(originSelector);
     let targetRuleSelectors = parseSelectors(targetRule.selector);
@@ -354,11 +380,67 @@ export default class Inherit {
     targetRuleSelectors = [...new Set(targetRuleSelectors)];
     targetRule.selector = assembleSelectors(targetRuleSelectors);
   }
+  /**
+   * Private: copies rule from one location to another.
+   * Used to copy rules from root that match inherit value in a PostCSS AtRule.
+   * Rule copied before the rule that contains the inherit declaration.
+   *
+   * * `originRule` {Object} PostCSS Rule (in the atRule) that contains inherit declaration
+   * * `targetRule` {Object} PostCSS Rule (in root) that matches inherit property
+   *
+   * ## Example
+   *
+   * Given this starting css:
+   *
+   *    .gray {
+   *      color: gray;
+   *    }
+   *    @media (min-width: 320px) {
+   *      .button {
+   *        inherit: .gray;
+   *      }
+   *    }
+   *
+   * When we run this:
+   *
+   *    this.copyRule(originRule, rule);
+   *
+   * Where `originRule` is the `.button` rule, and the `rule` is `.gray` we get:
+   *
+   *    .gray {
+   *      color: gray;
+   *      }
+   *    @media (min-width: 320px) {
+   *      .gray {
+   *        color: gray;
+   *      }
+   *      .button {
+   *        inherit: .gray;
+   *      }
+   *    }
+   *
+   * Does not return a value, but it transforms the PostCSS AST.
+   */
   copyRule(originRule, targetRule) {
     const newRule = clone(targetRule);
     newRule.moveBefore(originRule);
     return newRule;
   }
+  /**
+   * Private: after processing inherits, this method is used to remove all placeholder rules.
+   *
+   * ## Example
+   *
+   * Any placeholders like this (starting with `%` symbol):
+   *
+   *   %form-element {
+   *     cursor: not-allowed;
+   *   }
+   *
+   * Will be removed.
+   *
+   * Does not return a value, but it transforms the PostCSS AST.
+   */
   removePlaceholders() {
     this.root.walkRules(/%/, rule => {
       const selectors = parseSelectors(rule.selector);
