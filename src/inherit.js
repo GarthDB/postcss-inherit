@@ -90,7 +90,7 @@ function matchRegExp(val) {
  * Returns {RegExp} used to replace selector with inherit property inserted
  */
 function replaceRegExp(val) {
-  const operatorRegex = /($|::?|\[)/g;
+  const operatorRegex = /(::?|\[)/g;
   const newVal = (val.match(operatorRegex)) ? val.substring(0, val.search(operatorRegex)) : val;
   return matchRegExp(newVal);
 }
@@ -245,7 +245,7 @@ export default class Inherit {
    *
    * Does not return a value, but it transforms the PostCSS AST.
    */
-  constructor(css, opts = {}) {
+  constructor(css, opts) {
     this.root = css;
     this.matches = {};
     this.propertyRegExp = opts.propertyRegExp || /^(inherit|extend)s?$/i;

@@ -1,16 +1,16 @@
 {
   "name": "postcss-inherit",
-  "version": "0.0.0-semantically-released",
   "description": "PostCSS plugin inherit rules from other selectors",
   "main": "./lib/index.js",
   "scripts": {
     "start": "package-scripts",
     "test": "package-scripts test",
-    "prepublish": "package-scripts build"
+    "prepublish": "package-scripts build",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/garthdb/postcss-inherit.git"
+    "url": "https://github.com/GarthDB/postcss-inherit.git"
   },
   "keywords": [
     "postcss",
