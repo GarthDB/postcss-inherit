@@ -14,16 +14,16 @@ table .icon-link%icon {
 }
 
 .red-icon {
-  inherits: %icon;
+  @inherits: %icon;
   background-color: red;
 }
 
 .blue-icon {
-  inherits: %icon;
+  @inherits: %icon;
   background-color: blue;
 }
 
 .yellow-icon {
-  inherits: %icon;
+  @inherits: %icon;
   background-color: yellow;
 }

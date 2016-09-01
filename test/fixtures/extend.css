@@ -3,9 +3,9 @@
 }
 
 .b {
-  extend: .a;
+  @foo .a;
 }
 
 .c {
-  extends: .b;
+  @foo .b;
 }

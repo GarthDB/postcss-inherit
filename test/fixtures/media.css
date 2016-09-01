@@ -4,12 +4,12 @@
 
 @media (min-width: 320px) {
   .button {
-    inherit: .gray;
+    @inherit .gray;
   }
 }
 
 @media (min-width: 320px) {
   .new-button {
-    inherit: .button;
+    @inherit .button;
   }
 }

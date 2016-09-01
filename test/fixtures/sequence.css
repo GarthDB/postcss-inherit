@@ -7,5 +7,5 @@
 }
 
 .small-red-button {
-  inherit: %red-button;
+  @inherit: %red-button;
 }

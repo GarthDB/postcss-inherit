@@ -15,6 +15,7 @@
       "props": false
     }],
     "react/require-extension": 0,
+    "no-underscore-dangle": 0,
   },
   "plugins": [
     "import",

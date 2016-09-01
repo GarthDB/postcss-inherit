@@ -9,5 +9,5 @@
 }
 
 .clearfix {
-  inherits: %clearfix;
+  @inherits: %clearfix;
 }

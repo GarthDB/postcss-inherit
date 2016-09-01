@@ -1,5 +1,5 @@
 .a {
-  inherit: .b;
+  @inherit: .b;
 }
 
 .b {

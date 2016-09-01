@@ -3,6 +3,6 @@
 }
 
 .smaller-button {
-  extend: .button;
+  @extend .button;
   max-width: 250px;
 }

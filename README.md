@@ -28,8 +28,8 @@ postcss([ inherit ])
 
 Option parameters:
 
-* `propertyRegExp` - Regular expression to match the "inherit" property.
-  By default, it is `/^(inherit|extend)s?$/i`, so it matches "inherit", "inherits", "extend", and "extends".
+* `propertyRegExp` - Regular expression to match the "inherit" at-rule.
+  By default, it is `/^(inherit|extend)s?:?$/i`, so it matches "inherit", "inherits", "extend", and "extends".
   For example, if you only want to allow the `extend` keyword,
   set the regular expression to `/^extend$/`.
 
@@ -43,7 +43,7 @@ Option parameters:
 }
 
 .text {
-  inherit: .gray;
+  @inherit: .gray;
 }
 ```
 
@@ -70,7 +70,7 @@ Inherit multiple selectors at the same time.
 }
 
 .button {
-  inherit: .gray, .black;
+  @inherit: .gray, .black;
 }
 ```
 
@@ -99,7 +99,7 @@ Placeholders will not be output in the final CSS.
 }
 
 .text {
-  inherit: %gray;
+  @inherit: %gray;
 }
 ```
 
@@ -130,11 +130,11 @@ button span {
 }
 
 .button {
-  inherit: button;
+  @inherit: button;
 }
 
 .link {
-  inherit: div button;
+  @inherit: div button;
 }
 ```
 
@@ -167,12 +167,12 @@ button span,
 }
 
 .button-large {
-  inherit: .button;
+  @inherit: .button;
   padding: 10px;
 }
 
 .button-large-red {
-  inherit: .button-large;
+  @inherit: .button-large;
   color: red;
 }
 ```
@@ -211,13 +211,13 @@ so there will be some inevitable repetition.
 
 @media (min-width: 320px) {
   .button {
-    inherit: .gray;
+    @inherit: .gray;
   }
 }
 
 @media (min-width: 320px) {
   .link {
-    inherit: .gray;
+    @inherit: .gray;
   }
 }
 ```
@@ -239,4 +239,4 @@ yields:
 
 ### Limitations
 
-* You can not inherit a rule that is inside a media query; you can only inherit rules outside a media query. If you find yourself in this situation, just use placeholders instead.
+* When in a media query, you can only inherit rules from root, or rules contained in a media query with the same parameters.

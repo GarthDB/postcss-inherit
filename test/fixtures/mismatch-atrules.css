@@ -1,5 +1,5 @@
 .button {
-  inherit: .gray;
+  @inherit .gray;
 }
 
 @media (min-width: 320px) {

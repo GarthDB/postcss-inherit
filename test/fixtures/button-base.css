@@ -1,18 +1,18 @@
 @import "topcoat-utils";
 
 %button {
-  extend: %inline-block;
-  extend: %reset-box-model;
-  extend: %reset-base;
-  extend: %reset-cursor;
-  extend: %ellipsis;
+  @extend: %inline-block;
+  @extend: %reset-box-model;
+  @extend: %reset-base;
+  @extend: %reset-cursor;
+  @extend: %ellipsis;
   text-decoration: none;
 }
 
 %button--quiet {
-  extend: %reset-quiet;
+  @extend: %reset-quiet;
 }
 
 %button--disabled {
-  extend: %disabled;
+  @extend: %disabled;
 }

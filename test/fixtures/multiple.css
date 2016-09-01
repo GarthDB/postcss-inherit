@@ -7,5 +7,5 @@
 }
 
 .button {
-  inherit: .gray, .red;
+  @inherit .gray, .red;
 }

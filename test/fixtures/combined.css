@@ -11,5 +11,5 @@
 }
 
 .some-button {
-  inherits: %dark-button;
+  @inherits: %dark-button;
 }

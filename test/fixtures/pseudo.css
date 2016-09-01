@@ -7,9 +7,9 @@
 }
 
 .button--large {
-  extend: .button:active;
+  @extend: .button:active;
 }
 
 .button--quiet {
-  extend: .button::before;
+  @extend: .button::before;
 }

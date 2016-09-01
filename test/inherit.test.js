@@ -10,7 +10,7 @@ function runInherit(input, opts) {
   return postcss([
     inherit(opts),
     perfectionist({ indentSize: 2, maxAtRuleLength: false, maxSelectorLength: 1 }),
-  ]).process(input, { parser: inheritParser });
+  ]).process(input);
 }
 
 function read(file) {
@@ -124,7 +124,7 @@ test('should sequence complex inheritance (e.g. .one.two%three)', t => {
 
 test('should extend regexp', t => {
   const output = read('chain.out');
-  return runInherit(read('extend'), { propertyRegExp: /^extends?$/ }).then(result => {
+  return runInherit(read('extend'), { propertyRegExp: /^foo:?$/ }).then(result => {
     t.deepEqual(result.css.trim(), output);
   });
 });
@@ -162,6 +162,17 @@ test('should create a component', t => {
   const output = read('button.out');
   postcss([importAt(), inherit()])
     .process(inputcss, { from: './test/fixtures/button.css' })
+    .then((result) => {
+      t.deepEqual(result.css.trim(), output);
+    })
+    .catch(console.log);
+});
+
+test('should work with old inheritParser', t => {
+  const inputcss = read('placeholder');
+  const output = read('placeholder.out');
+  postcss([importAt(), inherit()])
+    .process(inputcss, { parser: inheritParser })
     .then((result) => {
       t.deepEqual(result.css.trim(), output);
     })

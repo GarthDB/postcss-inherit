@@ -19,5 +19,5 @@ em > span {
 }
 
 .test {
-  inherit: em;
+  @inherit: em;
 }

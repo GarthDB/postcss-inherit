@@ -7,5 +7,5 @@
 }
 
 input {
-  inherit: %form-element;
+  @inherit: %form-element;
 }

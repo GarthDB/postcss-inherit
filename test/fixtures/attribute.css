@@ -3,5 +3,5 @@
 }
 
 input, select, textarea {
-  inherit: %form-element;
+  @inherit %form-element;
 }

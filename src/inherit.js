@@ -9,11 +9,11 @@ const debug = require('debug')('postcss-inherit');
  *
  *    const atRule = postcss.parse('@media (min-width: 480px) {a{}}').first;
  *    const rule = atRule.first;
- *    isAtruleDescendant(rule); // returns '(min-width: 480px)'
+ *    _isAtruleDescendant(rule); // returns '(min-width: 480px)'
  *
  * Returns {Boolean} of false, or {String} of AtRule params if true.
  */
-function isAtruleDescendant(node) {
+function _isAtruleDescendant(node) {
   let { parent } = node;
   let descended = false;
 
@@ -33,11 +33,11 @@ function isAtruleDescendant(node) {
  * ## Example
  *
  *    const ruleName = '%placeholder';
- *    isPlaceholder(ruleName); // returns true
+ *    _isPlaceholder(ruleName); // returns true
  *
  * Returns {Boolean}
  */
-function isPlaceholder(val) {
+function _isPlaceholder(val) {
   return val[0] === '%';
 }
 /**
@@ -47,11 +47,11 @@ function isPlaceholder(val) {
  *
  * ## Example
  *
- *    escapeRegExp('div[class^="top"]::before'); // returns div\[class\^="top"\]::before
+ *    _escapeRegExp('div[class^="top"]::before'); // returns div\[class\^="top"\]::before
  *
  * Returns {String} for use in a regualr expression.
  */
-function escapeRegExp(str) {
+function _escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
 /**
@@ -61,15 +61,15 @@ function escapeRegExp(str) {
  *
  * ## Example
  *
- *    matchRegExp('div[class^="top"]::before');
+ *    _matchRegExp('div[class^="top"]::before');
  *    // returns /(^|\s|\>|\+|~)div\[class\^="top"\]::before($|\s|\>|\+|~|\:|\[)/g
  *
  * Returns {RegExp} used for finding rules that match inherit property.
  */
-function matchRegExp(val) {
-  const expression = `${escapeRegExp(val)}($|\\s|\\>|\\+|~|\\:|\\[)`;
+function _matchRegExp(val) {
+  const expression = `${_escapeRegExp(val)}($|\\s|\\>|\\+|~|\\:|\\[)`;
   let expressionPrefix = '(^|\\s|\\>|\\+|~)';
-  if (isPlaceholder(val)) {
+  if (_isPlaceholder(val)) {
     // We just want to match an empty group here to preserve the arguments we
     // may be expecting in a RegExp match.
     expressionPrefix = '()';
@@ -90,7 +90,7 @@ function matchRegExp(val) {
 function replaceRegExp(val) {
   const operatorRegex = /(::?|\[)/g;
   const newVal = (val.match(operatorRegex)) ? val.substring(0, val.search(operatorRegex)) : val;
-  return matchRegExp(newVal);
+  return _matchRegExp(newVal);
 }
 /**
  * Private: replaces selector with inherit property inserted.
@@ -101,12 +101,12 @@ function replaceRegExp(val) {
  *
  * ## Example
  *
- *    replaceSelector('.button-group %dark-button', '%dark-button', '.some-button');
+ *    _replaceSelector('.button-group %dark-button', '%dark-button', '.some-button');
  *    // returns '.button-group .some-button'
  *
  * Returns {String} new selector.
  */
-function replaceSelector(matchedSelector, val, selector) {
+function _replaceSelector(matchedSelector, val, selector) {
   return matchedSelector.replace(replaceRegExp(val), (_, first, last) =>
     first + selector + last
   );
@@ -119,12 +119,12 @@ function replaceSelector(matchedSelector, val, selector) {
  *
  * ## Example
  *
- *    makePlaceholder('.gray button', '.gray')
+ *    _makePlaceholder('.gray button', '.gray')
  *    // returns %.gray button
  *
  * Returns the transformed selector string {String}
  */
-function makePlaceholder(selector, value) {
+function _makePlaceholder(selector, value) {
   return selector.replace(replaceRegExp(value), (_, first, last) =>
     `${first}%${_.trim()}${last}`
   );
@@ -136,27 +136,27 @@ function makePlaceholder(selector, value) {
  *
  * ## Example
  *
- *    parseSelectors('.button-cta,.button');
+ *    _parseSelectors('.button-cta,.button');
  *    //returns ['.button-cta','.button']
  *
  * Returns {Array} of selector {Strings}
  */
-function parseSelectors(selector) {
+function _parseSelectors(selector) {
   return selector.split(',').map(x => x.trim());
 }
 /**
- * Private: reassembles an array of selectors, usually split by `parseSelectors`
+ * Private: reassembles an array of selectors, usually split by `_parseSelectors`
  *
  * * `selectors` {Array} of selector {Strings}
  *
  * ## Example
  *
- *    parseSelectors(['.button-cta','.button']);
+ *    _parseSelectors(['.button-cta','.button']);
  *    // returns '.button-cta,\n.button'
  *
  * Returns selector {String}
  */
-function assembleSelectors(selectors) {
+function _assembleSelectors(selectors) {
   return selectors.join(',\n');
 }
 /**
@@ -169,12 +169,12 @@ function assembleSelectors(selectors) {
  * ## Example
  *
  *    const obj = {'(min-width: 320px)':['.gray']};
- *    mediaMatch(obj, '(min-width: 320px)', value);
+ *    _mediaMatch(obj, '(min-width: 320px)', value);
  *    //returns true
  *
  * Returns {Boolean}
  */
-function mediaMatch(object, key, value) {
+function _mediaMatch(object, key, value) {
   if (!{}.hasOwnProperty.call(object, key)) {
     return false;
   }
@@ -189,10 +189,10 @@ function mediaMatch(object, key, value) {
  *
  *    const atRule = postcss.parse('@media (min-width: 480px) {a{}}').first;
  *    const rule = atRule.first;
- *    removeParentsIfEmpty(rule);
+ *    _removeParentsIfEmpty(rule);
  *    // removes `rule` and `atRule`
  */
-function removeParentsIfEmpty(node) {
+function _removeParentsIfEmpty(node) {
   let currentNode = node.parent;
   node.remove();
   while (!currentNode.nodes.length) {
@@ -211,17 +211,33 @@ function removeParentsIfEmpty(node) {
  *
  *    const arr = [ '%icon', '.red-icon', '.blue-icon' ];
  *    const regex = /()%icon($|\s|\>|\+|~|\:|\[)/g;
- *    findInArray(array, regex);
+ *    _findInArray(array, regex);
  *    // returns 0
  *
  * Returns {Int} index of array that matched.
  */
-function findInArray(array, regex) {
+function _findInArray(array, regex) {
   let result = -1;
   array.forEach((value, index) => {
     if (regex.test(value)) result = index;
   });
   return result;
+}
+/**
+ *  Private: removes whitespace (like `trim()`) and quotes at beginning and extend.
+ *
+ *  * `paramStr` {String} to clean (params property of at AtRule)
+ *
+ *  ## Example
+ *
+ *     _cleanParams(' ".button"');
+ *     // returns .button
+ *
+ *  Returns cleaned {String}
+ */
+function _cleanParams(paramStr) {
+  const regexp = /(^(?:(?:\s*")|(?:\s*')))|((?:(?:"\s*)|(?:'\s*))$)/g;
+  return paramStr.replace(regexp, '');
 }
 /**
  * Inherit Class
@@ -246,20 +262,19 @@ export default class Inherit {
   constructor(css, opts) {
     this.root = css;
     this.matches = {};
-    this.propertyRegExp = opts.propertyRegExp || /^(inherit|extend)s?$/i;
-    this.root.walkAtRules(atRule => {
-      this.atRuleInheritsFromRoot(atRule);
+    this.propertyRegExp = opts.propertyRegExp || /^(inherit|extend)s?:?$/i;
+    this.root.walkAtRules('media', atRule => {
+      this._atRuleInheritsFromRoot(atRule);
     });
-    this.root.walkDecls(decl => {
-      if (this.propertyRegExp.test(decl.prop)) {
-        const rule = decl.parent;
-        parseSelectors(decl.value).forEach(value => {
-          this.inheritRule(value, rule, decl);
-        });
-        removeParentsIfEmpty(decl);
-      }
+    this.root.walkAtRules(this.propertyRegExp, importRule => {
+      const rule = importRule.parent;
+      const importValue = _cleanParams(importRule.params);
+      _parseSelectors(importValue).forEach(value => {
+        this._inheritRule(value, rule, importRule);
+      });
+      _removeParentsIfEmpty(importRule);
     });
-    this.removePlaceholders();
+    this._removePlaceholders();
   }
   /**
    * Private: copies rules from root when inherited in an atRule descendant
@@ -269,40 +284,39 @@ export default class Inherit {
    * ## Example
    *
    *    this.root.walkAtRules(atRule => {
-   *      this.atRuleInheritsFromRoot(atRule);
+   *      this._atRuleInheritsFromRoot(atRule);
    *    });
    *
    * Does not return a value, but it transforms the PostCSS AST.
    */
-  atRuleInheritsFromRoot(atRule) {
-    atRule.walkDecls(decl => {
-      if (this.propertyRegExp.test(decl.prop)) {
-        const originRule = decl.parent;
-        const originAtParams = isAtruleDescendant(originRule);
-        const newValueArray = [];
-        parseSelectors(decl.value).forEach(value => {
-          const targetSelector = value;
-          let newValue = value;
-          this.root.walkRules(rule => {
-            if (!matchRegExp(targetSelector).test(rule.selector)) return;
-            const targetAtParams = isAtruleDescendant(rule);
-            if (!targetAtParams) {
-              newValue = `%${value}`;
-            } else {
-              return;
-            }
-            if (!mediaMatch(this.matches, originAtParams, targetSelector)) {
-              const newRule = this.copyRule(originRule, rule);
-              newRule.selector = makePlaceholder(newRule.selector, targetSelector);
-              this.matches[originAtParams] = this.matches[originAtParams] || [];
-              this.matches[originAtParams].push(targetSelector);
-              this.matches[originAtParams] = [...new Set(this.matches[originAtParams])];
-            }
-          });
-          newValueArray.push(newValue);
+  _atRuleInheritsFromRoot(atRule) {
+    atRule.walkAtRules(this.propertyRegExp, importRule => {
+      const originRule = importRule.parent;
+      const importValue = _cleanParams(importRule.params);
+      const originAtParams = _isAtruleDescendant(originRule);
+      const newValueArray = [];
+      _parseSelectors(importValue).forEach(value => {
+        const targetSelector = value;
+        let newValue = value;
+        this.root.walkRules(rule => {
+          if (!_matchRegExp(targetSelector).test(rule.selector)) return;
+          const targetAtParams = _isAtruleDescendant(rule);
+          if (!targetAtParams) {
+            newValue = `%${value}`;
+          } else {
+            return;
+          }
+          if (!_mediaMatch(this.matches, originAtParams, targetSelector)) {
+            const newRule = this._copyRule(originRule, rule);
+            newRule.selector = _makePlaceholder(newRule.selector, targetSelector);
+            this.matches[originAtParams] = this.matches[originAtParams] || [];
+            this.matches[originAtParams].push(targetSelector);
+            this.matches[originAtParams] = [...new Set(this.matches[originAtParams])];
+          }
         });
-        decl.value = newValueArray.join(', ');
-      }
+        newValueArray.push(newValue);
+      });
+      importRule.params = newValueArray.join(', ');
     });
   }
   /**
@@ -317,28 +331,28 @@ export default class Inherit {
    * `originRule` css:
    *
    *    .button {
-   *      inherit: .gray; // decl
+   *      @inherit: .gray; // decl
    *    }
    *
-   *    this.inheritRule('.gray', {originRule Obj}, {decl Obj});
+   *    this._inheritRule('.gray', {originRule Obj}, {decl Obj});
    *
    * Adds `.button` class to matching rule for `.gray`.
    *
    * Does not return a value, but it transforms the PostCSS AST.
    */
-  inheritRule(value, originRule, decl) {
+  _inheritRule(value, originRule, decl) {
     const originSelector = originRule.selector;
-    const originAtParams = originRule.atParams || isAtruleDescendant(originRule);
+    const originAtParams = originRule.atParams || _isAtruleDescendant(originRule);
     const targetSelector = value;
     let matched = false;
     let differentLevelMatched = false;
     this.root.walkRules(rule => {
-      if (!~findInArray(parseSelectors(rule.selector), matchRegExp(targetSelector))) return;
+      if (!~_findInArray(_parseSelectors(rule.selector), _matchRegExp(targetSelector))) return;
       const targetRule = rule;
-      const targetAtParams = targetRule.atParams || isAtruleDescendant(targetRule);
+      const targetAtParams = targetRule.atParams || _isAtruleDescendant(targetRule);
       if (targetAtParams === originAtParams) {
         debug('extend %j with %j', originSelector, targetSelector);
-        this.appendSelector(originSelector, targetRule, targetSelector);
+        this._appendSelector(originSelector, targetRule, targetSelector);
         matched = true;
       } else {
         differentLevelMatched = true;
@@ -362,21 +376,21 @@ export default class Inherit {
    *
    * ## Example
    *
-   *    this.appendSelector(originSelector, targetRule, targetSelector);
+   *    this._appendSelector(originSelector, targetRule, targetSelector);
    *
    * Does not return a value, but it transforms the PostCSS AST.
    */
-  appendSelector(originSelector, targetRule, value) {
-    const originSelectors = parseSelectors(originSelector);
-    let targetRuleSelectors = parseSelectors(targetRule.selector);
+  _appendSelector(originSelector, targetRule, value) {
+    const originSelectors = _parseSelectors(originSelector);
+    let targetRuleSelectors = _parseSelectors(targetRule.selector);
     targetRuleSelectors.forEach(targetRuleSelector => {
       [].push.apply(targetRuleSelectors, originSelectors.map(newOriginSelector =>
-        replaceSelector(targetRuleSelector, value, newOriginSelector)
+        _replaceSelector(targetRuleSelector, value, newOriginSelector)
       ));
     });
     // removes duplicate selectors
     targetRuleSelectors = [...new Set(targetRuleSelectors)];
-    targetRule.selector = assembleSelectors(targetRuleSelectors);
+    targetRule.selector = _assembleSelectors(targetRuleSelectors);
   }
   /**
    * Private: copies rule from one location to another.
@@ -395,13 +409,13 @@ export default class Inherit {
    *    }
    *    @media (min-width: 320px) {
    *      .button {
-   *        inherit: .gray;
+   *        @inherit: .gray;
    *      }
    *    }
    *
    * When we run this:
    *
-   *    this.copyRule(originRule, rule);
+   *    this._copyRule(originRule, rule);
    *
    * Where `originRule` is the `.button` rule, and the `rule` is `.gray` we get:
    *
@@ -413,13 +427,13 @@ export default class Inherit {
    *        color: gray;
    *      }
    *      .button {
-   *        inherit: .gray;
+   *        @inherit: .gray;
    *      }
    *    }
    *
    * Does not return a value, but it transforms the PostCSS AST.
    */
-  copyRule(originRule, targetRule) {
+  _copyRule(originRule, targetRule) {
     const newRule = targetRule.cloneBefore();
     newRule.moveBefore(originRule);
     return newRule;
@@ -439,16 +453,16 @@ export default class Inherit {
    *
    * Does not return a value, but it transforms the PostCSS AST.
    */
-  removePlaceholders() {
+  _removePlaceholders() {
     this.root.walkRules(/%/, rule => {
-      const selectors = parseSelectors(rule.selector);
+      const selectors = _parseSelectors(rule.selector);
       const newSelectors = selectors.filter(selector =>
         (!~selector.indexOf('%'))
       );
       if (!newSelectors.length) {
         rule.remove();
       } else {
-        rule.selector = assembleSelectors(newSelectors);
+        rule.selector = _assembleSelectors(newSelectors);
       }
     });
   }
