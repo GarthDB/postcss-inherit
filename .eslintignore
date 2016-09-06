@@ -9,3 +9,4 @@ npm-debug.log*
 inch.json
 /coverage
 /.nyc_output
+.*
