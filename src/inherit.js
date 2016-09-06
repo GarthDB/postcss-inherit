@@ -5,12 +5,6 @@ const debug = require('debug')('postcss-inherit');
  *
  * * `node` {Object} PostCSS Node to check.
  *
- * ## Example
- *
- *    const atRule = postcss.parse('@media (min-width: 480px) {a{}}').first;
- *    const rule = atRule.first;
- *    _isAtruleDescendant(rule); // returns '(min-width: 480px)'
- *
  * Returns {Boolean} of false, or {String} of AtRule params if true.
  */
 function _isAtruleDescendant(node) {
@@ -30,11 +24,6 @@ function _isAtruleDescendant(node) {
  *
  * * `val` a {String} intended for inherit value or rule name.
  *
- * ## Example
- *
- *    const ruleName = '%placeholder';
- *    _isPlaceholder(ruleName); // returns true
- *
  * Returns {Boolean}
  */
 function _isPlaceholder(val) {
@@ -45,10 +34,6 @@ function _isPlaceholder(val) {
  *
  * * `str` {String} to escape RegExp reserved characters.
  *
- * ## Example
- *
- *    _escapeRegExp('div[class^="top"]::before'); // returns div\[class\^="top"\]::before
- *
  * Returns {String} for use in a regualr expression.
  */
 function _escapeRegExp(str) {
@@ -58,11 +43,6 @@ function _escapeRegExp(str) {
  * Private: creates a regular expression used to find rules that match inherit property.
  *
  * * `val` {String} inherit property to use to find selectors that contain it.
- *
- * ## Example
- *
- *    _matchRegExp('div[class^="top"]::before');
- *    // returns /(^|\s|\>|\+|~)div\[class\^="top"\]::before($|\s|\>|\+|~|\:|\[)/g
  *
  * Returns {RegExp} used for finding rules that match inherit property.
  */
@@ -81,13 +61,9 @@ function _matchRegExp(val) {
  *
  * * `val` {String} inherit property to use to replace selectors that contain it.
  *
- * ## Example
- *
- *    replaceRegExp
- *
  * Returns {RegExp} used to replace selector with inherit property inserted
  */
-function replaceRegExp(val) {
+function _replaceRegExp(val) {
   const operatorRegex = /(::?|\[)/g;
   const newVal = (val.match(operatorRegex)) ? val.substring(0, val.search(operatorRegex)) : val;
   return _matchRegExp(newVal);
@@ -99,15 +75,10 @@ function replaceRegExp(val) {
  * * `val` {String} value of the inherit property
  * * `selector` {String} selector of the rule that contains the inherit declaration.
  *
- * ## Example
- *
- *    _replaceSelector('.button-group %dark-button', '%dark-button', '.some-button');
- *    // returns '.button-group .some-button'
- *
  * Returns {String} new selector.
  */
 function _replaceSelector(matchedSelector, val, selector) {
-  return matchedSelector.replace(replaceRegExp(val), (_, first, last) =>
+  return matchedSelector.replace(_replaceRegExp(val), (_, first, last) =>
     first + selector + last
   );
 }
@@ -117,15 +88,10 @@ function _replaceSelector(matchedSelector, val, selector) {
  * * `selector` {String} of the selector to replace
  * * `value` {String} portion of the selector to convert into a placeholder
  *
- * ## Example
- *
- *    _makePlaceholder('.gray button', '.gray')
- *    // returns %.gray button
- *
  * Returns the transformed selector string {String}
  */
 function _makePlaceholder(selector, value) {
-  return selector.replace(replaceRegExp(value), (_, first, last) =>
+  return selector.replace(_replaceRegExp(value), (_, first, last) =>
     `${first}%${_.trim()}${last}`
   );
 }
@@ -133,11 +99,6 @@ function _makePlaceholder(selector, value) {
  * Private: splits selectors divided by a comma
  *
  * * `selector` {String} comma delimited selectors.
- *
- * ## Example
- *
- *    _parseSelectors('.button-cta,.button');
- *    //returns ['.button-cta','.button']
  *
  * Returns {Array} of selector {Strings}
  */
@@ -148,11 +109,6 @@ function _parseSelectors(selector) {
  * Private: reassembles an array of selectors, usually split by `_parseSelectors`
  *
  * * `selectors` {Array} of selector {Strings}
- *
- * ## Example
- *
- *    _parseSelectors(['.button-cta','.button']);
- *    // returns '.button-cta,\n.button'
  *
  * Returns selector {String}
  */
@@ -166,12 +122,6 @@ function _assembleSelectors(selectors) {
  * * `key` {String} key of the nested object that might contain the value
  * * `value` {String} to check for
  *
- * ## Example
- *
- *    const obj = {'(min-width: 320px)':['.gray']};
- *    _mediaMatch(obj, '(min-width: 320px)', value);
- *    //returns true
- *
  * Returns {Boolean}
  */
 function _mediaMatch(object, key, value) {
@@ -184,13 +134,6 @@ function _mediaMatch(object, key, value) {
  * Private: removes PostCSS Node and all parents if left empty after removal.
  *
  * * `node` {Object} PostCSS Node to check.
- *
- * ## Example
- *
- *    const atRule = postcss.parse('@media (min-width: 480px) {a{}}').first;
- *    const rule = atRule.first;
- *    _removeParentsIfEmpty(rule);
- *    // removes `rule` and `atRule`
  */
 function _removeParentsIfEmpty(node) {
   let currentNode = node.parent;
@@ -207,13 +150,6 @@ function _removeParentsIfEmpty(node) {
  * * `array` {Array} that might contain a match
  * * `regex` {RegExp} used to test values of `array`
  *
- * ## Example
- *
- *    const arr = [ '%icon', '.red-icon', '.blue-icon' ];
- *    const regex = /()%icon($|\s|\>|\+|~|\:|\[)/g;
- *    _findInArray(array, regex);
- *    // returns 0
- *
  * Returns {Int} index of array that matched.
  */
 function _findInArray(array, regex) {
@@ -228,11 +164,6 @@ function _findInArray(array, regex) {
  *
  *  * `paramStr` {String} to clean (params property of at AtRule)
  *
- *  ## Example
- *
- *     _cleanParams(' ".button"');
- *     // returns .button
- *
  *  Returns cleaned {String}
  */
 function _cleanParams(paramStr) {
@@ -244,20 +175,11 @@ function _cleanParams(paramStr) {
  */
 export default class Inherit {
   /**
-   * Public: Inherit class constructor
+   * Public: Inherit class constructor. Does not return a value, but it transforms the PostCSS AST.
    *
-   * `css` {Object} PostCSS AST that will be transformed by the inherit plugin
-   * `opts` {Object} of inherit plugin specific options
-   *
-   * ## Example
-   *
-   *    export default postcss.plugin('postcss-inherit',
-   *      (opts = {}) =>
-   *        (css) =>
-   *          new Inherit(css, opts)
-   *    );
-   *
-   * Does not return a value, but it transforms the PostCSS AST.
+   * * `css` {Object} PostCSS AST that will be transformed by the inherit plugin
+   * * `opts` {Object} of inherit plugin specific options
+   *   * `propertyRegExp` {RegExp} to use for AtRule name (defaults to use inherit(s)/extend(s)).
    */
   constructor(css, opts) {
     this.root = css;
@@ -277,17 +199,10 @@ export default class Inherit {
     this._removePlaceholders();
   }
   /**
-   * Private: copies rules from root when inherited in an atRule descendant
+   * Private: copies rules from root when inherited in an atRule descendant.
+   * Does not return a value, but it transforms the PostCSS AST.
    *
    * * `atRule` {Object} PostCSS AtRule
-   *
-   * ## Example
-   *
-   *    this.root.walkAtRules(atRule => {
-   *      this._atRuleInheritsFromRoot(atRule);
-   *    });
-   *
-   * Does not return a value, but it transforms the PostCSS AST.
    */
   _atRuleInheritsFromRoot(atRule) {
     atRule.walkAtRules(this.propertyRegExp, importRule => {
@@ -321,24 +236,11 @@ export default class Inherit {
   }
   /**
    * Private: Finds selectors that match value and add the selector for the originRule as needed.
+   * Does not return a value, but it transforms the PostCSS AST.
    *
    * * `value` {String} inherit declaration value
    * * `originRule` {Object} the PostCSS Rule that contains the inherit declaration
    * * `decl` {Object} the original inherit PostCSS Declaration
-   *
-   * ## Example
-   *
-   * `originRule` css:
-   *
-   *    .button {
-   *      @inherit: .gray; // decl
-   *    }
-   *
-   *    this._inheritRule('.gray', {originRule Obj}, {decl Obj});
-   *
-   * Adds `.button` class to matching rule for `.gray`.
-   *
-   * Does not return a value, but it transforms the PostCSS AST.
    */
   _inheritRule(value, originRule, decl) {
     const originSelector = originRule.selector;
@@ -368,17 +270,12 @@ export default class Inherit {
   }
   /**
    * Private: appends selector from originRule to matching rules.
+   * Does not return a value, but it transforms the PostCSS AST.
    *
    * * `originSelector` {String} selector from originRule to append
    * * `targetRule` {Object} PostCSS Rule that matched value.
    *   Will have originSelector appended to it
    * * `value` {String} inherit declaration value
-   *
-   * ## Example
-   *
-   *    this._appendSelector(originSelector, targetRule, targetSelector);
-   *
-   * Does not return a value, but it transforms the PostCSS AST.
    */
   _appendSelector(originSelector, targetRule, value) {
     const originSelectors = _parseSelectors(originSelector);
@@ -396,42 +293,10 @@ export default class Inherit {
    * Private: copies rule from one location to another.
    * Used to copy rules from root that match inherit value in a PostCSS AtRule.
    * Rule copied before the rule that contains the inherit declaration.
+   * Does not return a value, but it transforms the PostCSS AST.
    *
    * * `originRule` {Object} PostCSS Rule (in the atRule) that contains inherit declaration
    * * `targetRule` {Object} PostCSS Rule (in root) that matches inherit property
-   *
-   * ## Example
-   *
-   * Given this starting css:
-   *
-   *    .gray {
-   *      color: gray;
-   *    }
-   *    @media (min-width: 320px) {
-   *      .button {
-   *        @inherit: .gray;
-   *      }
-   *    }
-   *
-   * When we run this:
-   *
-   *    this._copyRule(originRule, rule);
-   *
-   * Where `originRule` is the `.button` rule, and the `rule` is `.gray` we get:
-   *
-   *    .gray {
-   *      color: gray;
-   *      }
-   *    @media (min-width: 320px) {
-   *      .gray {
-   *        color: gray;
-   *      }
-   *      .button {
-   *        @inherit: .gray;
-   *      }
-   *    }
-   *
-   * Does not return a value, but it transforms the PostCSS AST.
    */
   _copyRule(originRule, targetRule) {
     const newRule = targetRule.cloneBefore();
@@ -440,17 +305,6 @@ export default class Inherit {
   }
   /**
    * Private: after processing inherits, this method is used to remove all placeholder rules.
-   *
-   * ## Example
-   *
-   * Any placeholders like this (starting with `%` symbol):
-   *
-   *   %form-element {
-   *     cursor: not-allowed;
-   *   }
-   *
-   * Will be removed.
-   *
    * Does not return a value, but it transforms the PostCSS AST.
    */
   _removePlaceholders() {
