@@ -62,7 +62,7 @@
     "eslint-plugin-jsx-a11y": "^2.1.0",
     "eslint-plugin-react": "^6.0.0",
     "nyc": "^8.1.0",
-    "p-s": "^2.4.3",
+    "p-s": "^3.0.0",
     "perfectionist": "^2.1.4",
     "postcss-import": "^8.1.2",
     "semantic-release": "^4.3.5",
