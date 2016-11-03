@@ -37,7 +37,7 @@ function _isPlaceholder(val) {
  * Returns {String} for use in a regualr expression.
  */
 function _escapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+  return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
 }
 /**
  * Private: creates a regular expression used to find rules that match inherit property.
@@ -128,7 +128,7 @@ function _mediaMatch(object, key, value) {
   if (!{}.hasOwnProperty.call(object, key)) {
     return false;
   }
-  return Boolean(~object[key].indexOf(value));
+  return Boolean(object[key].indexOf(value) >= 0);
 }
 /**
  * Private: removes PostCSS Node and all parents if left empty after removal.
@@ -171,27 +171,74 @@ function _cleanParams(paramStr) {
   return paramStr.replace(regexp, '');
 }
 /**
+ *  Private: copies rule from one location to another.
+ *  Used to copy rules from root that match inherit value in a PostCSS AtRule.
+ *  Rule copied before the rule that contains the inherit declaration.
+ *  Does not return a value, but it transforms the PostCSS AST.
+ *
+ *  * `originRule` {Object} PostCSS Rule (in the atRule) that contains inherit declaration
+ *  * `targetRule` {Object} PostCSS Rule (in root) that matches inherit property
+ *
+ *  Returns copied {Object} PostCSS Rule.
+ */
+function _copyRule(originRule, targetRule) {
+  const newRule = targetRule.cloneBefore();
+  newRule.moveBefore(originRule);
+  return newRule;
+}
+/**
+ * Private: appends selector from originRule to matching rules.
+ * Does not return a value, but it transforms the PostCSS AST.
+ *
+ * * `originSelector` {String} selector from originRule to append
+ * * `targetRule` {Object} PostCSS Rule that matched value.
+ *   Will have originSelector appended to it
+ * * `value` {String} inherit declaration value
+ */
+function _appendSelector(originSelector, targetRule, value) {
+  const originSelectors = _parseSelectors(originSelector);
+  let targetRuleSelectors = _parseSelectors(targetRule.selector);
+  targetRuleSelectors.forEach((targetRuleSelector) => {
+    [].push.apply(targetRuleSelectors, originSelectors.map(newOriginSelector =>
+      _replaceSelector(targetRuleSelector, value, newOriginSelector)
+    ));
+  });
+  // removes duplicate selectors
+  targetRuleSelectors = [...new Set(targetRuleSelectors)];
+  targetRule.selector = _assembleSelectors(targetRuleSelectors);
+}
+/**
  * Inherit Class
  */
 export default class Inherit {
   /**
-   * Public: Inherit class constructor. Does not return a value, but it transforms the PostCSS AST.
+   *  Public: Inherit class constructor. Does not return a value, but it transforms the PostCSS AST.
    *
-   * * `css` {Object} PostCSS AST that will be transformed by the inherit plugin
-   * * `opts` {Object} of inherit plugin specific options
-   *   * `propertyRegExp` {RegExp} to use for AtRule name (defaults to use inherit(s)/extend(s)).
+   *  * `css` {Object} PostCSS AST that will be transformed by the inherit plugin
+   *  * `opts` {Object} of inherit plugin specific options
+   *    * `propertyRegExp` {RegExp} to use for AtRule name (defaults to use inherit(s)/extend(s)).
+   *
+   *  ## Examples
+   *
+   *  ```js
+   *  export default postcss.plugin('postcss-inherit',
+   *    (opts = {}) =>
+   *      css =>
+   *        new Inherit(css, opts)
+   *  );
+   *  ```
    */
   constructor(css, opts) {
     this.root = css;
     this.matches = {};
     this.propertyRegExp = opts.propertyRegExp || /^(inherit|extend)s?:?$/i;
-    this.root.walkAtRules('media', atRule => {
+    this.root.walkAtRules('media', (atRule) => {
       this._atRuleInheritsFromRoot(atRule);
     });
-    this.root.walkAtRules(this.propertyRegExp, importRule => {
+    this.root.walkAtRules(this.propertyRegExp, (importRule) => {
       const rule = importRule.parent;
       const importValue = _cleanParams(importRule.params);
-      _parseSelectors(importValue).forEach(value => {
+      _parseSelectors(importValue).forEach((value) => {
         this._inheritRule(value, rule, importRule);
       });
       _removeParentsIfEmpty(importRule);
@@ -205,15 +252,15 @@ export default class Inherit {
    * * `atRule` {Object} PostCSS AtRule
    */
   _atRuleInheritsFromRoot(atRule) {
-    atRule.walkAtRules(this.propertyRegExp, importRule => {
+    atRule.walkAtRules(this.propertyRegExp, (importRule) => {
       const originRule = importRule.parent;
       const importValue = _cleanParams(importRule.params);
       const originAtParams = _isAtruleDescendant(originRule);
       const newValueArray = [];
-      _parseSelectors(importValue).forEach(value => {
+      _parseSelectors(importValue).forEach((value) => {
         const targetSelector = value;
         let newValue = value;
-        this.root.walkRules(rule => {
+        this.root.walkRules((rule) => {
           if (!_matchRegExp(targetSelector).test(rule.selector)) return;
           const targetAtParams = _isAtruleDescendant(rule);
           if (!targetAtParams) {
@@ -222,7 +269,7 @@ export default class Inherit {
             return;
           }
           if (!_mediaMatch(this.matches, originAtParams, targetSelector)) {
-            const newRule = this._copyRule(originRule, rule);
+            const newRule = _copyRule(originRule, rule);
             newRule.selector = _makePlaceholder(newRule.selector, targetSelector);
             this.matches[originAtParams] = this.matches[originAtParams] || [];
             this.matches[originAtParams].push(targetSelector);
@@ -248,13 +295,13 @@ export default class Inherit {
     const targetSelector = value;
     let matched = false;
     let differentLevelMatched = false;
-    this.root.walkRules(rule => {
-      if (!~_findInArray(_parseSelectors(rule.selector), _matchRegExp(targetSelector))) return;
+    this.root.walkRules((rule) => {
+      if (_findInArray(_parseSelectors(rule.selector), _matchRegExp(targetSelector)) === -1) return;
       const targetRule = rule;
       const targetAtParams = targetRule.atParams || _isAtruleDescendant(targetRule);
       if (targetAtParams === originAtParams) {
         debug('extend %j with %j', originSelector, targetSelector);
-        this._appendSelector(originSelector, targetRule, targetSelector);
+        _appendSelector(originSelector, targetRule, targetSelector);
         matched = true;
       } else {
         differentLevelMatched = true;
@@ -269,49 +316,14 @@ export default class Inherit {
     }
   }
   /**
-   * Private: appends selector from originRule to matching rules.
-   * Does not return a value, but it transforms the PostCSS AST.
-   *
-   * * `originSelector` {String} selector from originRule to append
-   * * `targetRule` {Object} PostCSS Rule that matched value.
-   *   Will have originSelector appended to it
-   * * `value` {String} inherit declaration value
-   */
-  _appendSelector(originSelector, targetRule, value) {
-    const originSelectors = _parseSelectors(originSelector);
-    let targetRuleSelectors = _parseSelectors(targetRule.selector);
-    targetRuleSelectors.forEach(targetRuleSelector => {
-      [].push.apply(targetRuleSelectors, originSelectors.map(newOriginSelector =>
-        _replaceSelector(targetRuleSelector, value, newOriginSelector)
-      ));
-    });
-    // removes duplicate selectors
-    targetRuleSelectors = [...new Set(targetRuleSelectors)];
-    targetRule.selector = _assembleSelectors(targetRuleSelectors);
-  }
-  /**
-   * Private: copies rule from one location to another.
-   * Used to copy rules from root that match inherit value in a PostCSS AtRule.
-   * Rule copied before the rule that contains the inherit declaration.
-   * Does not return a value, but it transforms the PostCSS AST.
-   *
-   * * `originRule` {Object} PostCSS Rule (in the atRule) that contains inherit declaration
-   * * `targetRule` {Object} PostCSS Rule (in root) that matches inherit property
-   */
-  _copyRule(originRule, targetRule) {
-    const newRule = targetRule.cloneBefore();
-    newRule.moveBefore(originRule);
-    return newRule;
-  }
-  /**
    * Private: after processing inherits, this method is used to remove all placeholder rules.
    * Does not return a value, but it transforms the PostCSS AST.
    */
   _removePlaceholders() {
-    this.root.walkRules(/%/, rule => {
+    this.root.walkRules(/%/, (rule) => {
       const selectors = _parseSelectors(rule.selector);
       const newSelectors = selectors.filter(selector =>
-        (!~selector.indexOf('%'))
+        (selector.indexOf('%') === -1)
       );
       if (!newSelectors.length) {
         rule.remove();
