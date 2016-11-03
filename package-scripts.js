@@ -6,8 +6,8 @@ module.exports = {
     },
     test: {
       default: {
-        description: 'Runs AVA with nyc (which is configured in package.json)',
         script: 'nyc ava',
+        description: 'Runs AVA with nyc (which is configured in package.json)',
       },
       watch: {
         description: 'Run AVA in watch mode',
