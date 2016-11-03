@@ -7,6 +7,6 @@ import Inherit from './inherit';
  */
 export default postcss.plugin('postcss-inherit',
   (opts = {}) =>
-    (css) =>
+    css =>
       new Inherit(css, opts)
 );

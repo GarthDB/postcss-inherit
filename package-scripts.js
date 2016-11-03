@@ -6,8 +6,8 @@ module.exports = {
     },
     test: {
       default: {
-        description: 'Runs AVA with nyc (which is configured in package.json)',
         script: 'nyc ava',
+        description: 'Runs AVA with nyc (which is configured in package.json)',
       },
       watch: {
         description: 'Run AVA in watch mode',
@@ -30,9 +30,13 @@ module.exports = {
       description: 'We automate releases with semantic-release. This should only be run on travis',
       script: 'semantic-release pre && npm publish && semantic-release post',
     },
+    docs: {
+      description: 'Checks Atomdoc to make sure it shows the most helpful information',
+      script: 'atomdoc src',
+    },
     validate: {
       description: 'This runs several scripts to make sure things look good before committing',
-      script: 'p-s -p lint,build,test',
+      script: 'p-s -p lint,docs,build,test',
     },
   },
   options: {
