@@ -1,0 +1,15 @@
+@keyframes fontbulger {
+  from {
+    font-size: 10px;
+  }
+  30% {
+    font-size: 15px;
+  }
+  to {
+    font-size: 12px;
+  }
+}
+
+#box {
+  animation: fontbulger 2s infinite;
+}

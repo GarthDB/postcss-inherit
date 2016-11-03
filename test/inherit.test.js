@@ -185,3 +185,10 @@ test('should process nested rules', (t) => {
     t.deepEqual(result.css.trim(), output);
   });
 });
+
+test('should not lose keyframes', (t) => {
+  const output = read('keyframes.out');
+  return runInherit(read('keyframes')).then((result) => {
+    t.deepEqual(result.css.trim(), output);
+  });
+});
