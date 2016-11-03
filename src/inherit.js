@@ -320,7 +320,7 @@ export default class Inherit {
    * Does not return a value, but it transforms the PostCSS AST.
    */
   _removePlaceholders() {
-    this.root.walkRules(/%/, (rule) => {
+    this.root.walkRules(/^%|\s+%|\w%\w/, (rule) => {
       const selectors = _parseSelectors(rule.selector);
       const newSelectors = selectors.filter(selector =>
         (selector.indexOf('%') === -1)
