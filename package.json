@@ -40,7 +40,7 @@
   },
   "homepage": "https://github.com/topmarks/topmarks#readme",
   "dependencies": {
-    "debug": "^2.2.0",
+    "debug": "^2.5.2",
     "postcss": "^5.0.10",
     "postcss-inherit-parser": "^0.1.3"
   },
