@@ -48,7 +48,7 @@
     "atomdoc-cli": "^1.0.3",
     "ava": "^0.16.0",
     "babel-cli": "^6.18.0",
-    "babel-core": "^6.18.2",
+    "babel-core": "^6.23.1",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^2.0.3",
     "babel-preset-es2015": "^6.18.0",
