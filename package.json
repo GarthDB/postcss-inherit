@@ -56,7 +56,7 @@
     "codeclimate-test-reporter": "^0.4.0",
     "codecov": "^1.0.1",
     "commitizen": "^2.8.6",
-    "cz-customizable": "^4.0.0",
+    "cz-customizable": "^5.0.0",
     "eslint": "^3.9.1",
     "eslint-config-airbnb": "^12.0.0",
     "eslint-plugin-import": "^2.0.1",
