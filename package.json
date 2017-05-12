@@ -65,7 +65,7 @@
     "nyc": "^8.4.0",
     "p-s": "^3.0.1",
     "perfectionist": "^2.3.1",
-    "postcss-import": "^8.1.2",
+    "postcss-import": "^10.0.0",
     "semantic-release": "^4.3.5",
     "topcoat-utils": "^1.0.0"
   },
