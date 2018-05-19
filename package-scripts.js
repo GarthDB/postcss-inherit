@@ -28,7 +28,7 @@ module.exports = {
     },
     validate: {
       description: 'This runs several scripts to make sure things look good before committing',
-      script: 'nps -p lint,docs,build,test',
+      script: 'nps lint build test',
     },
   },
   options: {

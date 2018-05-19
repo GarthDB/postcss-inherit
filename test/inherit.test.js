@@ -10,7 +10,7 @@ function runInherit(input, opts) {
   return postcss([
     inherit(opts),
     perfectionist({ indentSize: 2, maxAtRuleLength: false, maxSelectorLength: 1 }),
-  ]).process(input, {from: undefined});
+  ]).process(input, { from: undefined });
 }
 
 function read(file) {
@@ -136,25 +136,21 @@ test('should extend pseudo class', (t) => {
   });
 });
 
-test('should throw an error when missing a selector', (t) => {
-  return t.throws(runInherit(read('missing-selector')), /Could not find rule that matched %form\./);
-});
+test('should throw an error when missing a selector', t => t.throws(runInherit(read('missing-selector')), /Could not find rule that matched %form\./));
 
-test('should throw an error when atrules don\'t match', (t) => {
-  return t.throws(
-    runInherit(read('mismatch-atrules')),
-    /Could not find rule that matched \.gray in the same atRule\./
-  );
-});
+test('should throw an error when atrules don\'t match', t => t.throws(
+  runInherit(read('mismatch-atrules')),
+  /Could not find rule that matched \.gray in the same atRule\./,
+));
 
 test('should work after another plugin', (t) => {
   const inputcss = read('import');
   const output = read('import.out');
-  return postcss([importAt(), inherit()]).process(inputcss, {from: undefined})
-  .then((result) => {
-    t.deepEqual(result.css.trim(), output);
-  })
-  .catch(console.log);
+  return postcss([importAt(), inherit()]).process(inputcss, { from: undefined })
+    .then((result) => {
+      t.deepEqual(result.css.trim(), output);
+    })
+    .catch(console.log);
 });
 
 test('should create a component', (t) => {
@@ -172,7 +168,7 @@ test('should work with old inheritParser', (t) => {
   const inputcss = read('placeholder');
   const output = read('placeholder.out');
   return postcss([importAt(), inherit()])
-    .process(inputcss, {from: undefined, parser: inheritParser })
+    .process(inputcss, { from: undefined, parser: inheritParser })
     .then((result) => {
       t.deepEqual(result.css.trim(), output);
     })
