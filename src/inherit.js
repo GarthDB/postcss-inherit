@@ -174,7 +174,6 @@ function _cleanParams(paramStr) {
  *  Private: copies rule from one location to another.
  *  Used to copy rules from root that match inherit value in a PostCSS AtRule.
  *  Rule copied before the rule that contains the inherit declaration.
- *  Does not return a value, but it transforms the PostCSS AST.
  *
  *  * `originRule` {Object} PostCSS Rule (in the atRule) that contains inherit declaration
  *  * `targetRule` {Object} PostCSS Rule (in root) that matches inherit property
@@ -183,7 +182,8 @@ function _cleanParams(paramStr) {
  */
 function _copyRule(originRule, targetRule) {
   const newRule = targetRule.cloneBefore();
-  newRule.moveBefore(originRule);
+  newRule.before(originRule);
+  console.log(newRule)
   return newRule;
 }
 /**
