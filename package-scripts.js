@@ -1,9 +1,5 @@
 module.exports = {
   scripts: {
-    commit: {
-      description: 'This uses commitizen to help us generate well formatted commit messages',
-      script: 'git-cz',
-    },
     test: {
       default: {
         script: 'nyc ava',
@@ -26,17 +22,13 @@ module.exports = {
       description: 'Report coverage stats to codecov. This should be run after the `test` script',
       script: 'nyc report -r lcovonly && codecov',
     },
-    release: {
-      description: 'We automate releases with semantic-release. This should only be run on travis',
-      script: 'semantic-release pre && npm publish && semantic-release post',
-    },
     docs: {
       description: 'Checks Atomdoc to make sure it shows the most helpful information',
       script: 'atomdoc src',
     },
     validate: {
       description: 'This runs several scripts to make sure things look good before committing',
-      script: 'p-s -p lint,docs,build,test',
+      script: 'nps lint build test',
     },
   },
   options: {

@@ -2,7 +2,6 @@ language: node_js
 node_js:
   - "6"
 script:
-  - npm start validate
+  - npm start -- validate
 after_success:
   - npm start report-coverage
-  - npm start release
