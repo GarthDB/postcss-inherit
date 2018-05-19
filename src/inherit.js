@@ -182,8 +182,7 @@ function _cleanParams(paramStr) {
  */
 function _copyRule(originRule, targetRule) {
   const newRule = targetRule.cloneBefore();
-  newRule.before(originRule);
-  console.log(newRule)
+  originRule.before(newRule);
   return newRule;
 }
 /**

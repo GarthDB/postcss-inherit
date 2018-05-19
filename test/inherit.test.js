@@ -137,11 +137,11 @@ test('should extend pseudo class', (t) => {
 });
 
 test('should throw an error when missing a selector', (t) => {
-  t.throws(runInherit(read('missing-selector')), /Could not find rule that matched %form\./);
+  return t.throws(runInherit(read('missing-selector')), /Could not find rule that matched %form\./);
 });
 
 test('should throw an error when atrules don\'t match', (t) => {
-  t.throws(
+  return t.throws(
     runInherit(read('mismatch-atrules')),
     /Could not find rule that matched \.gray in the same atRule\./
   );
